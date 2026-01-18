@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 from typing import List, Optional, Dict, Any
 from sqlalchemy.orm import Session
+from datetime import datetime
 from ..database import get_db
 from ..models import IslamicCharacter
 from ..schemas import CharacterResponse
@@ -76,7 +77,30 @@ async def get_featured_by_category(
     ).order_by(IslamicCharacter.name).limit(limit).all()
     
     # Convert to response models
-    return [CharacterResponse.model_validate(char) for char in characters]
+    response_characters = []
+    for char in characters:
+        response_characters.append(CharacterResponse(
+            id=char.id,
+            name=char.name,
+            arabic_name=char.arabic_name,
+            english_name=getattr(char, 'english_name', None),
+            title=char.title,
+            description=char.description,
+            category=char.category,
+            era=char.era,
+            sub_category=getattr(char, 'sub_category', None),
+            slug=getattr(char, 'slug', f"character-{char.id}"),
+            profile_image=char.profile_image,
+            views_count=char.views_count,
+            likes_count=char.likes_count,
+            shares_count=getattr(char, 'shares_count', 0),
+            is_featured=getattr(char, 'is_featured', False),
+            is_verified=getattr(char, 'is_verified', False),
+            verification_source=getattr(char, 'verification_source', None),
+            verification_notes=getattr(char, 'verification_notes', None),
+            created_at=getattr(char, 'created_at', datetime.now())
+        ))
+    return response_characters
 
 @router.get("/featured/general", response_model=List[CharacterResponse])
 async def get_featured_general(
@@ -89,7 +113,30 @@ async def get_featured_general(
     ).order_by(IslamicCharacter.name).limit(limit).all()
     
     # Convert to response models
-    return [CharacterResponse.model_validate(char) for char in characters]
+    response_characters = []
+    for char in characters:
+        response_characters.append(CharacterResponse(
+            id=char.id,
+            name=char.name,
+            arabic_name=char.arabic_name,
+            english_name=getattr(char, 'english_name', None),
+            title=char.title,
+            description=char.description,
+            category=char.category,
+            era=char.era,
+            sub_category=getattr(char, 'sub_category', None),
+            slug=getattr(char, 'slug', f"character-{char.id}"),
+            profile_image=char.profile_image,
+            views_count=char.views_count,
+            likes_count=char.likes_count,
+            shares_count=getattr(char, 'shares_count', 0),
+            is_featured=getattr(char, 'is_featured', False),
+            is_verified=getattr(char, 'is_verified', False),
+            verification_source=getattr(char, 'verification_source', None),
+            verification_notes=getattr(char, 'verification_notes', None),
+            created_at=getattr(char, 'created_at', datetime.now())
+        ))
+    return response_characters
 
 @router.get("/timeline/all")
 async def get_global_timeline(
@@ -118,7 +165,7 @@ async def get_random_quotes(
     db: Session = Depends(get_db)
 ) -> List[Dict[str, Any]]:
     """Get random quotes from characters"""
-    query = db.query(IslamicCharacter).filter(IslamicCharacter.quques.isnot(None))
+    query = db.query(IslamicCharacter).filter(IslamicCharacter.quotes.isnot(None))
     
     if category:
         query = query.filter(IslamicCharacter.category == category)
@@ -150,15 +197,19 @@ async def get_important_locations(db: Session = Depends(get_db)) -> List[Dict[st
     
     for character in characters:
         if character.birth_place:
-            locations[character.birth_place] = {
-                "type": "birth_place",
-                "characters": locations.get(character.birth_place, {}).get("characters", []) + [character.name]
-            }
+            if character.birth_place not in locations:
+                locations[character.birth_place] = {
+                    "type": "birth_place",
+                    "characters": []
+                }
+            locations[character.birth_place]["characters"].append(character.name)
         if character.death_place:
-            locations[character.death_place] = {
-                "type": "death_place", 
-                "characters": locations.get(character.death_place, {}).get("characters", []) + [character.name]
-            }
+            if character.death_place not in locations:
+                locations[character.death_place] = {
+                    "type": "death_place", 
+                    "characters": []
+                }
+            locations[character.death_place]["characters"].append(character.name)
         if character.locations:
             for location in character.locations:
                 if location not in locations:

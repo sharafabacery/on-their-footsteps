@@ -1,9 +1,14 @@
 import axios from 'axios'
+import ApiService from './apiService'
+import { requestDeduplication } from '../utils/requestDeduplicator'
 
 // Base API configuration
 const API_BASE_URL = import.meta.env.VITE_API_URL || '/api'
 const MAX_RETRIES = 3
 const RETRY_DELAY = 1000 // 1 second
+
+// Create ApiService instance for dependency injection
+const apiService = new ApiService()
 
 // Create axios instance with default config
 const api = axios.create({
@@ -22,13 +27,13 @@ const api = axios.create({
 // Request interceptor
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token')
+    const token = apiService.getToken()
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
     }
     
     // Set language
-    const language = localStorage.getItem('language') || 'ar'
+    const language = apiService.getLanguage()
     config.headers['Accept-Language'] = language
     
     return config
@@ -57,7 +62,7 @@ api.interceptors.response.use(
   (response) => {
     // Handle successful responses
     if (response.data?.token) {
-      localStorage.setItem('token', response.data.token)
+      apiService.setToken(response.data.token)
     }
     return response
   },
@@ -87,8 +92,8 @@ api.interceptors.response.use(
             const response = await api.post('/api/auth/refresh')
             const { token } = response.data;
             
-            // Update the token in localStorage and axios headers
-            localStorage.setItem('token', token);
+            // Update the token in storage and axios headers
+            apiService.setToken(token);
             api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
             originalRequest.headers['Authorization'] = `Bearer ${token}`;
             
@@ -96,68 +101,74 @@ api.interceptors.response.use(
             return api(originalRequest);
           } catch (refreshError) {
             // If refresh token fails, log the user out
-            localStorage.removeItem('token');
-            localStorage.removeItem('user');
-            window.location.href = '/login';
+            apiService.removeToken();
+            apiService.removeUser();
+            apiService.navigateToLogin();
             return Promise.reject(refreshError);
           }
         } else {
           // If we've already tried to refresh or it's the refresh endpoint itself
-          localStorage.removeItem('token');
-          localStorage.removeItem('user');
-          window.location.href = '/login';
+          apiService.removeToken();
+          apiService.removeUser();
+          apiService.navigateToLogin();
         }
         break;
       case 403:
-        error.message = 'ليس لديك صلاحية للوصول إلى هذا المورد.';
+        error.message = 'ليس لديك صلاحية للوصول إلى هذا المورد.'
         break;
       case 404:
-        error.message = 'لم يتم العثور على المورد المطلوب.';
+        error.message = 'لم يتم العثور على المورد المطلوب.'
         break;
       case 429:
-        error.message = 'لقد تجاوزت الحد المسموح من الطلبات. يرجى المحاولة لاحقًا.';
+        error.message = 'لقد تجاوزت الحد المسموح من الطلبات. يرجى المحاولة لاحقًا.'
         break;
       case 500:
-        error.message = 'حدث خطأ في الخادم. يرجى المحاولة مرة أخرى.';
+        error.message = 'حدث خطأ في الخادم. يرجى المحاولة مرة أخرى.'
         break;
       default:
-        error.message = error.response.data?.message || 'حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى.';
+        error.message = error.response.data?.message || 'حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى.'
     }
     
-    return Promise.reject(error);
+    return Promise.reject(error)
   }
 )
 
-// Helper function to handle API calls with retry logic
+// Helper function to handle API calls with retry logic and deduplication
 const apiRequest = async (method, url, data = null, config = {}) => {
-  try {
-    const response = await api({
-      method,
-      url,
-      data,
-      ...config,
-      headers: {
-        ...config.headers,
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
-      },
-    })
-    return response
-  } catch (error) {
-    // If it's a network error, try to retry
-    if (!error.response) {
-      return retryRequest({
+  // Create request function for deduplication
+  const requestFn = async () => {
+    try {
+      const response = await api({
         method,
         url,
         data,
         ...config,
         headers: {
           ...config.headers,
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          'Authorization': `Bearer ${apiService.getToken()}`,
         },
       })
+      return response
+    } catch (error) {
+      // If it's a network error, try to retry
+      if (!error.response) {
+        return retryRequest({
+          method,
+          url,
+          data,
+          ...config,
+          headers: {
+            ...config.headers,
+            'Authorization': `Bearer ${apiService.getToken()}`,
+          },
+        })
+      }
+      throw error
     }
-    throw error
   }
+
+  // Use request deduplication
+  return await requestDeduplication.executeRequest(requestFn, method, url, data, config)
 }
 
 export const characters = {
@@ -190,7 +201,7 @@ export const auth = {
   login: (credentials) => apiRequest('post', '/auth/login', credentials),
   register: (userData) => apiRequest('post', '/auth/register', userData),
   logout: () => {
-    localStorage.removeItem('token')
+    apiService.removeToken()
     return apiRequest('post', '/auth/logout')
   },
   getProfile: () => apiRequest('get', '/auth/me'),

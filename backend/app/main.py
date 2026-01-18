@@ -1,3 +1,21 @@
+"""FastAPI application for Islamic characters educational platform.
+
+This module provides the main FastAPI application with comprehensive middleware,
+routing, and lifecycle management. It handles database initialization, caching,
+monitoring, and request logging.
+
+Attributes:
+    app (FastAPI): The main FastAPI application instance
+    logger: Structured logger for application events
+    MONITORING_AVAILABLE (bool): Flag indicating if monitoring is enabled
+    CACHE_AVAILABLE (bool): Flag indicating if Redis cache is available
+
+Example:
+    >>> from app.main import app
+    >>> app.title
+    'على خطاهم API'
+"""
+
 from fastapi import FastAPI, Depends, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -7,7 +25,7 @@ import time
 import uuid
 
 from .database import init_db, get_db
-from .api import characters, progress, stats, auth, content, users, media, analytics, recommendations
+from .api import characters, progress, stats, auth, content, users, media, analytics, recommendations, performance
 from .config import settings
 from .logging_config import get_logger, log_api_request, log_api_response, log_security_event
 
@@ -28,10 +46,37 @@ except ImportError as e:
     logger.warning(f"Cache module not available: {e}")
     CACHE_AVAILABLE = False
 
+# Import rate limiter modules with error handling
+try:
+    from .utils.rate_limiter import set_rate_limiter, set_ip_blocker
+    RATE_LIMITING_AVAILABLE = True
+except ImportError as e:
+    logger = get_logger(__name__)
+    logger.warning(f"Rate limiting modules not available: {e}")
+    RATE_LIMITING_AVAILABLE = False
+
 logger = get_logger(__name__)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    """Application lifespan manager for startup and shutdown procedures.
+    
+    Handles database initialization, Redis connection testing, upload directory
+    creation, and graceful shutdown procedures.
+    
+    Args:
+        app (FastAPI): The FastAPI application instance
+        
+    Yields:
+        None: Control is yielded to the application during runtime
+        
+    Raises:
+        Exception: If critical startup components fail to initialize
+        
+    Example:
+        >>> app = FastAPI(lifespan=lifespan)
+        >>> # Application will startup and shutdown properly
+    """
     # Startup
     logger.info("Application starting up...")
     logger.info(f"Database initialized: {settings.DATABASE_URL}")
@@ -52,8 +97,14 @@ async def lifespan(app: FastAPI):
         if CACHE_AVAILABLE and cache.is_available():
             cache.redis_client.ping()
             logger.info("Redis connection test successful")
+            
+            # Initialize rate limiter with Redis
+            if RATE_LIMITING_AVAILABLE:
+                set_rate_limiter(cache.redis_client)
+                set_ip_blocker(cache.redis_client)
+                logger.info("Rate limiting initialized with Redis")
         else:
-            logger.warning("Redis not available - caching disabled")
+            logger.warning("Redis not available - caching and rate limiting disabled")
         
     except Exception as e:
         logger.error(f"Startup failed: {e}")
@@ -94,6 +145,17 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
+    """Log incoming requests and outgoing responses.
+    
+    Adds request ID and process time headers to responses.
+    
+    Args:
+        request (Request): The incoming request instance
+        call_next (Callable): The next middleware or route handler
+        
+    Returns:
+        Response: The outgoing response instance
+    """
     start_time = time.time()
     request_id = str(uuid.uuid4())
     
@@ -132,7 +194,19 @@ async def log_requests(request: Request, call_next):
 # Health check endpoint
 @app.get("/api/health", tags=["Health"])
 async def health_check():
-    """Health check endpoint for monitoring"""
+    """Health check endpoint for monitoring application status.
+    
+    Returns basic health information including service status, version,
+    and current timestamp. Used by load balancers and monitoring systems.
+    
+    Returns:
+        dict: Health status information with service details
+        
+    Example:
+        >>> response = client.get("/api/health")
+        >>> response.json()
+        {'status': 'healthy', 'service': 'على خطاهم API', 'version': '2.0.0'}
+    """
     return {
         "status": "healthy", 
         "service": "على خطاهم API",
@@ -144,12 +218,42 @@ async def health_check():
 if MONITORING_AVAILABLE:
     @app.get("/api/metrics", tags=["Monitoring"])
     async def metrics_endpoint():
-        """Get application metrics"""
+        """Get application metrics for monitoring and performance analysis.
+        
+        Returns comprehensive application metrics including request counts,
+        response times, database performance, and system resource usage.
+        
+        Returns:
+            dict: Application metrics data
+            
+        Raises:
+            HTTPException: If monitoring is not available (503)
+            
+        Example:
+            >>> response = client.get("/api/metrics")
+            >>> response.json()
+            {'requests_total': 1000, 'avg_response_time': 0.123}
+        """
         return await get_metrics()
 
     @app.get("/api/metrics/prometheus", tags=["Monitoring"])
     async def prometheus_metrics():
-        """Get metrics in Prometheus format"""
+        """Get metrics in Prometheus format for integration with monitoring systems.
+        
+        Returns metrics formatted according to Prometheus exposition format,
+        suitable for scraping by Prometheus server or compatible monitoring tools.
+        
+        Returns:
+            str: Prometheus-formatted metrics data
+            
+        Raises:
+            HTTPException: If monitoring is not available (503)
+            
+        Example:
+            >>> response = client.get("/api/metrics/prometheus")
+            >>> response.text
+            '# HELP api_requests_total Total API requests'
+        """
         return get_prometheus_metrics()
 else:
     @app.get("/api/metrics", tags=["Monitoring"])
@@ -172,9 +276,24 @@ app.include_router(users.router, prefix="/api/users", tags=["User Management"])
 app.include_router(media.router, prefix="/api/media", tags=["Media Management"])
 app.include_router(analytics.router, prefix="/api/analytics", tags=["Analytics"])
 app.include_router(recommendations.router, prefix="/api/recommendations", tags=["Recommendations"])
+app.include_router(performance.router, prefix="/api/performance", tags=["Performance"])
 
 @app.get("/")
 async def root():
+    """Root endpoint providing basic API information and navigation links.
+    
+    Returns a welcome message with API version and links to documentation
+    and health check endpoints. Useful for API discovery and basic
+    connectivity testing.
+    
+    Returns:
+        dict: Welcome message with API information and navigation links
+        
+    Example:
+        >>> response = client.get("/")
+        >>> response.json()
+        {'message': 'مرحباً بك في تطبيق على خُطاهم', 'version': '2.0.0'}
+    """
     return {
         "message": "مرحباً بك في تطبيق 'على خُطاهم'",
         "version": "2.0.0",

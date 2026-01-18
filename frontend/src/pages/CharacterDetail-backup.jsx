@@ -1,122 +1,118 @@
-import React, { useState, useEffect, Suspense, lazy } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { useParams } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import { motion } from 'framer-motion'
 import { Clock, MapPin, ChevronRight, BookOpen, Users, Volume2, Star } from 'lucide-react'
 import Lottie from 'lottie-react'
-import { useCharacter } from '../hooks/useCharacters'
+import api from '../services/api'
 import AudioPlayer from '../components/AudioPlayer'
 import LoadingSpinner from '../components/common/LoadingSpinner'
 import ErrorDisplay from '../components/ErrorDisplay'
+import CharacterHero from '../components/CharacterHero'
+import CharacterActions from '../components/CharacterActions'
+import CharacterTabs from '../components/CharacterTabs'
+import CharacterStats from '../components/CharacterStats'
+import CharacterTimeline from '../components/CharacterTimeline'
 import { getErrorMessage } from '../utils/errorHandler'
-
-// Lazy load heavy components
-const CharacterHero = lazy(() => import('../components/CharacterHero'));
-const CharacterActions = lazy(() => import('../components/CharacterActions'));
-const CharacterTabs = lazy(() => import('../components/CharacterTabs'));
-const CharacterStats = lazy(() => import('../components/CharacterStats'));
-const CharacterTimeline = lazy(() => import('../components/CharacterTimeline'));
 
 const CharacterDetail = () => {
   const { id } = useParams()
+  const [character, setCharacter] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
   const [activeTab, setActiveTab] = useState('story')
   const [bookmarked, setBookmarked] = useState(false)
-  
-  // Use the new character hook
-  const { 
-    character, 
-    loading, 
-    error, 
-    toggleLike, 
-    shareCharacter, 
-    incrementViews,
-    clearError 
-  } = useCharacter(id)
 
-  // Increment views when character loads
+  // Refs for request cancellation
+  const abortControllerRef = useRef(null)
+
   useEffect(() => {
-    if (character && !loading) {
-      incrementViews()
+    // Cancel any existing request
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort()
     }
-  }, [character, loading, incrementViews])
 
-  // Handle bookmark toggle
-  const handleBookmarkToggle = async () => {
-    if (!character) return
-    
-    try {
-      const updatedCharacter = await toggleLike(!bookmarked)
-      if (updatedCharacter) {
-        setBookmarked(!bookmarked)
+    // Create new abort controller
+    const controller = new AbortController()
+    abortControllerRef.current = controller
+
+    fetchCharacter(controller.signal)
+
+    // Cleanup function
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort()
       }
+    }
+  }, [id])
+
+  const fetchCharacter = async (signal) => {
+    try {
+      setLoading(true)
+      setError(null)
+
+      const response = await api.get(`/characters/${id}`, { signal })
+
+      if (!response.data) {
+        throw new Error('Character data is empty')
+      }
+
+      setCharacter(response.data)
+
+      // Check if bookmarked
+      const progressResponse = await api.get(`/progress/character/${id}`, { signal })
+      setBookmarked(progressResponse.data?.bookmarked || false)
+
     } catch (err) {
-      console.error('Failed to toggle bookmark:', err)
+      // Don't show error for cancelled requests
+      if (err.name !== 'AbortError') {
+        const errorMessage = getErrorMessage(err, 'فشل في تحميل بيانات الشخصية')
+        setError(errorMessage)
+      }
+    } finally {
+      setLoading(false)
     }
   }
 
-  // Handle share
-  const handleShare = async () => {
-    if (!character) return
-    
+  const handleBookmark = async () => {
     try {
-      const result = await shareCharacter()
-      if (result) {
-        // Implement native share or copy to clipboard
-        if (navigator.share) {
-          await navigator.share({
-            title: character.arabic_name || character.name,
-            text: character.description,
-            url: window.location.href
+      const newBookmarkState = !bookmarked
+      await api.put(`/progress/character/${id}`, { bookmarked: newBookmarkState })
+      setBookmarked(newBookmarkState)
+    } catch (err) {
+      console.error('Error updating bookmark:', err)
+      // Show user-friendly error message
+      alert('فشل في تحديث الإشارة المرجعية. يرجى المحاولة مرة أخرى')
+    }
+  }
+
+  const handleShare = () => {
+    try {
+      if (navigator.share && character) {
+        navigator.share({
+          title: `قصة ${character.arabic_name || character.name}`,
+          text: character.description,
+          url: window.location.href,
+        })
+      } else {
+        // Fallback: Copy to clipboard
+        navigator.clipboard.writeText(window.location.href)
+          .then(() => {
+            alert('تم نسخ الرابط إلى الحافظة')
           })
-        } else {
-          // Fallback: copy to clipboard
-          navigator.clipboard.writeText(window.location.href)
-        }
+          .catch(() => {
+            alert('فشل في نسخ الرابط')
+          })
       }
     } catch (err) {
-      console.error('Failed to share character:', err)
+      console.error('Error sharing:', err)
+      alert('فشل في المشاركة')
     }
   }
 
-  // Handle retry
-  const handleRetry = () => {
-    clearError()
-  }
-
-  // Loading state
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50 flex items-center justify-center">
-        <LoadingSpinner size="large" />
-      </div>
-    )
-  }
-
-  // Error state
-  if (error) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50 flex items-center justify-center">
-        <ErrorDisplay 
-          error={error} 
-          onRetry={handleRetry}
-          title="حدث خطأ في تحميل بيانات الشخصية"
-        />
-      </div>
-    )
-  }
-
-  // No character found
-  if (!character) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50 flex items-center justify-center">
-        <ErrorDisplay 
-          error={{ message: 'لم يتم العثور على الشخصية' }} 
-          onRetry={handleRetry}
-          title="الشخصية غير موجودة"
-        />
-      </div>
-    )
-  }
+  if (loading) return <LoadingSpinner />
+  if (error) return <ErrorDisplay error={error} />
+  if (!character) return <ErrorDisplay error="الشخصية غير موجودة" />
 
   return (
     <div>
@@ -132,9 +128,7 @@ const CharacterDetail = () => {
 
       <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
         {/* Hero Section */}
-        <Suspense fallback={<LoadingSpinner />}>
-          <CharacterHero character={character} />
-        </Suspense>
+        <CharacterHero character={character} />
 
         {/* Main Content */}
         <div className="container mx-auto px-4 py-12">
@@ -142,22 +136,18 @@ const CharacterDetail = () => {
             {/* Left Column - Story Content */}
             <div className="lg:col-span-2">
               {/* Actions */}
-              <Suspense fallback={<LoadingSpinner />}>
-                <CharacterActions
-                  bookmarked={bookmarked}
-                  onBookmark={handleBookmarkToggle}
-                  onShare={handleShare}
-                />
-              </Suspense>
+              <CharacterActions
+                bookmarked={bookmarked}
+                onBookmark={handleBookmark}
+                onShare={handleShare}
+              />
 
               {/* Tabs */}
-              <Suspense fallback={<LoadingSpinner />}>
-                <CharacterTabs
-                  character={character}
-                  activeTab={activeTab}
-                  setActiveTab={setActiveTab}
-                />
-              </Suspense>
+              <CharacterTabs
+                character={character}
+                activeTab={activeTab}
+                setActiveTab={setActiveTab}
+              />
 
               {activeTab === 'story' && (
                 <motion.div

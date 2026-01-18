@@ -16,7 +16,7 @@ class ErrorBoundary extends React.Component {
     // Update state so the next render will show the fallback UI
     return { 
       hasError: true,
-      errorId: this.generateErrorId()
+      errorId: `err_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
     }
   }
 

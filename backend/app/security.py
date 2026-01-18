@@ -163,24 +163,32 @@ class SecurityManager:
         return result
     
     @staticmethod
-    def rate_limit_check(request: Request, limit: int = 100, window: int = 3600) -> bool:
-        """Check rate limiting (simplified version)"""
-        # In production, this would use Redis or similar
-        client_ip = request.client.host if request.client else "unknown"
+    async def rate_limit_check(request: Request, limit: int = 100, window: int = 3600) -> bool:
+        """Check rate limiting (now uses dedicated rate limiter)"""
+        from .utils.rate_limiter import get_rate_limiter
         
-        # Log rate limit check
-        log_security_event(
-            logger,
-            "rate_limit_check",
-            {
-                "ip": client_ip,
-                "limit": limit,
-                "window": window
-            }
-        )
+        rate_limiter = get_rate_limiter()
+        if not rate_limiter:
+            # Fallback to simple check if rate limiter not available
+            client_ip = request.client.host if request.client else "unknown"
+            log_security_event(
+                logger,
+                "rate_limit_check_fallback",
+                {
+                    "ip": client_ip,
+                    "limit": limit,
+                    "window": window
+                }
+            )
+            return True
         
-        # For now, always return True (implement actual rate limiting in production)
-        return True
+        # Use dedicated rate limiter
+        try:
+            result = await rate_limiter.check_rate_limit(request, 'default')
+            return result['allowed']
+        except Exception as e:
+            logger.error(f"Rate limit check error: {e}")
+            return True  # Allow request if rate limiter fails
     
     @staticmethod
     def is_safe_url(url: str, allowed_hosts: List[str] = None) -> bool:

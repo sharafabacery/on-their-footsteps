@@ -2,7 +2,7 @@ import React from 'react'
 import { motion } from 'framer-motion'
 import { Star } from 'lucide-react'
 
-const CharacterHero = ({ character }) => {
+const CharacterHero = React.memo(({ character }) => {
   return (
     <div className="relative h-96 overflow-hidden">
       {/* Background Image */}
@@ -36,7 +36,7 @@ const CharacterHero = ({ character }) => {
 
           {/* Name and Title */}
           <h1 className="text-5xl md:text-6xl font-bold mb-4 font-arabic-heading">
-            {character.arabic_name}
+            {character.arabic_name || character.name}
           </h1>
           <h2 className="text-3xl md:text-4xl font-bold mb-6">
             {character.name}
@@ -62,4 +62,15 @@ const CharacterHero = ({ character }) => {
   )
 }
 
-export default CharacterHero
+// Custom comparison function for React.memo
+const arePropsEqual = (prevProps, nextProps) => {
+  return (
+    prevProps.character?.id === nextProps.character?.id &&
+    prevProps.character?.name === nextProps.character?.name &&
+    prevProps.character?.arabic_name === nextProps.character?.arabic_name &&
+    prevProps.character?.profile_image === nextProps.character?.profile_image &&
+    prevProps.character?.is_verified === nextProps.character?.is_verified
+  );
+};
+
+export default React.memo(CharacterHero, arePropsEqual);
