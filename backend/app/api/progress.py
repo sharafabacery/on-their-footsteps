@@ -5,6 +5,7 @@ router = APIRouter()
 
 # Mock data - replace with actual database operations
 user_progress = {}
+character_progress = {}
 
 @router.get("/{user_id}")
 async def get_user_progress(user_id: int):
@@ -12,6 +13,18 @@ async def get_user_progress(user_id: int):
     if user_id not in user_progress:
         return {"user_id": user_id, "completed_lessons": [], "current_character": None}
     return user_progress[user_id]
+
+@router.get("/character/{character_id}")
+async def get_character_progress(character_id: str):
+    """Get progress for a specific character"""
+    # Return mock progress data
+    return {
+        "character_id": character_id,
+        "bookmarked": False,
+        "completed_sections": [],
+        "progress_percentage": 0,
+        "last_accessed": None
+    }
 
 @router.post("/{user_id}/complete-lesson/{lesson_id}")
 async def complete_lesson(user_id: int, lesson_id: int):
@@ -25,12 +38,12 @@ async def complete_lesson(user_id: int, lesson_id: int):
     return {"message": "Lesson marked as completed"}
 
 @router.post("/{character_id}")
-async def update_progress(character_id: int, data: dict):
+async def update_progress(character_id: str, data: dict):
     """Update progress for a character"""
     return {"message": "Progress updated", "character_id": character_id, "data": data}
 
 @router.put("/{character_id}")
-async def update_bookmark(character_id: int, data: dict):
+async def update_bookmark(character_id: str, data: dict):
     """Update bookmark status for a character"""
     return {"message": "Bookmark updated", "character_id": character_id, "bookmarked": data.get("bookmarked", False)}
 

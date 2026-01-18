@@ -37,7 +37,7 @@ app = FastAPI(
 # CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.ALLOWED_ORIGINS,
+    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],  
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -45,6 +45,17 @@ app.add_middleware(
 
 # Mount static files
 app.mount("/static", StaticFiles(directory="static"), name="static")
+
+# Health check endpoint
+@app.get("/api/health", tags=["Health"])
+async def health_check():
+    """Health check endpoint for monitoring"""
+    return {
+        "status": "healthy", 
+        "service": "على خطاهم API",
+        "version": "2.0.0",
+        "timestamp": "2024-01-01T00:00:00Z"
+    }
 
 # Include routers
 app.include_router(auth.router, prefix="/api/auth", tags=["Authentication"])
@@ -60,7 +71,3 @@ async def root():
         "docs": "/api/docs",
         "health": "/api/health"
     }
-
-@app.get("/api/health")
-async def health_check():
-    return {"status": "healthy", "timestamp": "2024-01-01T00:00:00Z"}

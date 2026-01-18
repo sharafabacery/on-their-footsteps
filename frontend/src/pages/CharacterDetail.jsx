@@ -36,14 +36,16 @@ const CharacterDetail = () => {
     try {
       setLoading(true)
       const response = await api.get(`/characters/${id}`)
+      console.log('Character data:', response.data)
       setCharacter(response.data)
       
       // Check if bookmarked
-      const progressResponse = await api.get(`/progress/${id}`)
+      const progressResponse = await api.get(`/progress/character/${id}`)
+      console.log('Progress data:', progressResponse.data)
       setBookmarked(progressResponse.data?.bookmarked || false)
     } catch (err) {
-      setError('فشل في تحميل بيانات الشخصية')
       console.error('Error fetching character:', err)
+      setError('فشل في تحميل بيانات الشخصية')
     } finally {
       setLoading(false)
     }
@@ -69,8 +71,8 @@ const CharacterDetail = () => {
   }
 
   if (loading) return <LoadingSpinner />
-  if (error) return <ErrorDisplay message={error} />
-  if (!character) return <ErrorDisplay message="الشخصية غير موجودة" />
+  if (error) return <ErrorDisplay error={error} />
+  if (!character) return <ErrorDisplay error="الشخصية غير موجودة" />
 
   return (
     <>
@@ -366,7 +368,7 @@ const CharacterDetail = () => {
               )}
 
               {/* Animation Preview */}
-              {character.animations?.[0] && (
+              {false && character.animations?.[0] && (
                 <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
                   <h3 className="text-xl font-bold mb-4">معاينة</h3>
                   <div className="aspect-square">
@@ -375,6 +377,12 @@ const CharacterDetail = () => {
                       loop={true}
                       autoplay={true}
                       className="w-full h-full"
+                      rendererSettings={{
+                        preserveAspectRatio: 'xMidYMid meet'
+                      }}
+                      onError={(error) => {
+                        console.error('Lottie error:', error)
+                      }}
                     />
                   </div>
                 </div>

@@ -14,28 +14,44 @@ const Home = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    let isMounted = true;
+    
     const fetchData = async () => {
       try {
         setLoading(true);
-        const [charactersResponse, categoriesResponse] = await Promise.all([
-          characters.getAll({ limit: 6, featured: true }),
+        setError(null);
+        
+        // Use getFeatured for featured characters instead of filtering
+        const [featured, categoriesList] = await Promise.all([
+          characters.getFeatured(6),
           characters.getCategories()
         ]);
         
-        setFeaturedCharacters(charactersResponse.data || []);
-        setCategories(categoriesResponse.data || []);
+        if (isMounted) {
+          setFeaturedCharacters(Array.isArray(featured) ? featured : []);
+          setCategories(Array.isArray(categoriesList) ? categoriesList : []);
+        }
       } catch (err) {
-        setError('فشل في تحميل البيانات');
-        console.error('Error fetching home data:', err);
+        if (isMounted) {
+          setError(err.message || 'فشل في تحميل البيانات. يرجى المحاولة مرة أخرى لاحقاً');
+          console.error('Error fetching home data:', err);
+        }
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     };
 
     fetchData();
+    
+    // Cleanup function to prevent state updates after unmount
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
-  if (loading) {
+  if (loading && !featuredCharacters.length) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <LoadingSpinner size="large" />
@@ -43,14 +59,14 @@ const Home = () => {
     );
   }
 
-  if (error) {
+  if (error && !featuredCharacters.length) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center p-4">
         <div className="text-center">
           <h2 className="text-2xl font-bold text-red-600 mb-4">{error}</h2>
           <button 
-            onClick={() => window.location.reload()}
-            className="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
+            onClick={() => window.location.reload()} 
+            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
           >
             إعادة المحاولة
           </button>
@@ -78,7 +94,15 @@ const Home = () => {
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {featuredCharacters.map((character) => (
-              <CharacterCard key={character.id} character={character} />
+              <CharacterCard
+                key={character.id}
+                id={character.id}
+                name={character.name}
+                title={character.title}
+                era={character.era}
+                imageUrl={character.image_url || '/images/placeholder.jpg'}
+                slug={character.slug}
+              />
             ))}
           </div>
           

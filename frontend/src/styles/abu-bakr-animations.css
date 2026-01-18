@@ -1,0 +1,112 @@
+/* أنيميشن خاصة بأبو بكر الصديق */
+
+@keyframes hijra-path {
+  0% {
+    stroke-dashoffset: 1000;
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+}
+
+@keyframes cave-glow {
+  0%, 100% {
+    filter: drop-shadow(0 0 5px rgba(234, 179, 8, 0.5));
+  }
+  50% {
+    filter: drop-shadow(0 0 20px rgba(234, 179, 8, 0.8));
+  }
+}
+
+@keyframes arabic-calligraphy {
+  0% {
+    stroke-dashoffset: 1000;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes scroll-reveal {
+  0% {
+    clip-path: inset(0 100% 0 0);
+  }
+  100% {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+/* فئات خاصة بالأنيميشن */
+.hijra-animation {
+  animation: hijra-path 3s ease-in-out forwards;
+}
+
+.cave-glow {
+  animation: cave-glow 2s infinite ease-in-out;
+}
+
+.arabic-calligraphy {
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 1000;
+  animation: arabic-calligraphy 4s ease-in-out forwards;
+}
+
+.scroll-reveal {
+  animation: scroll-reveal 1.5s ease-out forwards;
+}
+
+/* تأثيرات تفاعلية */
+.character-card-hover {
+  transition: all 0.3s ease;
+}
+
+.character-card-hover:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+.timeline-dot-pulse {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.8;
+  }
+}
+
+/* تدرجات لونية إسلامية */
+.bg-islamic-gradient {
+  background: linear-gradient(135deg, 
+    #0a5c36 0%, 
+    #166534 25%, 
+    #059669 50%, 
+    #10b981 75%, 
+    #34d399 100%
+  );
+}
+
+.text-gradient-gold {
+  background: linear-gradient(45deg, #d4af37, #fbbf24, #f59e0b);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* تأثيرات الظل */
+.shadow-islamic {
+  box-shadow: 
+    0 10px 25px rgba(5, 150, 105, 0.1),
+    0 5px 15px rgba(5, 150, 105, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
