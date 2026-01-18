@@ -33,11 +33,16 @@ from ..schemas import CharacterResponse, CharacterCreate
 from ..logging_config import get_logger, log_database_operation, log_error
 from ..cache import cache_result, CharacterCache, invalidate_character_cache
 from ..utils.rate_limiter import rate_limit
-from ..utils.query_optimizer import QueryOptimizer, monitor_query_performance
+from ..utils.query_optimizer import QueryOptimizer
 import json
 
 router = APIRouter()
 logger = get_logger(__name__)
+
+@router.get("/test")
+async def test_endpoint():
+    """Simple test endpoint"""
+    return {"message": "test working"}
 
 # Character slug mapping for backward compatibility
 CHARACTER_SLUGS = {
@@ -49,7 +54,7 @@ CHARACTER_SLUGS = {
 }
 
 @router.get("/", response_model=List[CharacterResponse])
-@rate_limit(key='default', limit=100, window=3600)  # 100 requests per hour
+# @rate_limit(key='default')  # Temporarily disabled for debugging
 async def get_characters(
     page: int = Query(1, ge=1, description="Page number for pagination (starts from 1)"),
     limit: int = Query(12, ge=1, le=100, description="Number of items per page (max 100)"),

@@ -285,7 +285,7 @@ class TestRateLimitDecorator:
     @pytest.mark.asyncio
     async def test_rate_limit_decorator_allowed(self, setup_rate_limiter):
         """Test decorator allows requests within limit."""
-        @rate_limit(key='test', limit=5, window=3600)
+        @rate_limit(key='test')
         async def test_endpoint():
             return {"message": "success"}
         
@@ -300,7 +300,7 @@ class TestRateLimitDecorator:
     @pytest.mark.asyncio
     async def test_rate_limit_decorator_exceeded(self, setup_rate_limiter):
         """Test decorator blocks requests exceeding limit."""
-        @rate_limit(key='test', limit=1, window=3600)
+        @rate_limit(key='test')
         async def test_endpoint():
             return {"message": "success"}
         
@@ -325,7 +325,7 @@ class TestRateLimitDecorator:
         # Don't setup rate limiter
         set_rate_limiter(None)
         
-        @rate_limit(key='test', limit=1, window=3600)
+        @rate_limit(key='test')
         async def test_endpoint():
             return {"message": "success"}
         
