@@ -9,13 +9,13 @@ from app.security import get_current_active_user
 
 router = APIRouter(prefix="/api/levels", tags=["levels"])
 
-@router.get("/", response_model=List[schemas.Level])
+@router.get("/", response_model=List[schemas.LevelResponse])
 async def get_levels(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     """Get all available levels"""
     levels = db.query(models.Level).order_by(models.Level.xp_required).offset(skip).limit(limit).all()
     return levels
 
-@router.get("/{level_id}", response_model=schemas.Level)
+@router.get("/{level_id}", response_model=schemas.LevelResponse)
 async def get_level(level_id: int, db: Session = Depends(get_db)):
     """Get details of a specific level"""
     level = db.query(models.Level).filter(models.Level.id == level_id).first()

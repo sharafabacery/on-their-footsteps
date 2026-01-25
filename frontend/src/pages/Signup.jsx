@@ -4,7 +4,8 @@ import { useAuth } from '../context/AuthContext'
 import { useGamification } from '../context/GamificationContext'
 import LoadingSpinner from '../components/common/LoadingSpinner'
 import toast from 'react-hot-toast'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
+import { EyeIcon, EyeSlashIcon, CheckCircleIcon, XCircleIcon, SparklesIcon } from '@heroicons/react/24/outline'
 
 const Signup = () => {
   const [formData, setFormData] = useState({
@@ -117,12 +118,12 @@ const Signup = () => {
     if (/[!@#$%^&*(),.?":{}|<>]/.test(password)) strength++
     
     const strengthLevels = [
-      { text: 'ضعيفة جداً', color: 'red' },
-      { text: 'ضعيفة', color: 'orange' },
-      { text: 'متوسطة', color: 'yellow' },
-      { text: 'جيدة', color: 'blue' },
-      { text: 'قوية', color: 'green' },
-      { text: 'قوية جداً', color: 'green' }
+      { text: 'ضعيفة جداً', color: 'text-red-400' },
+      { text: 'ضعيفة', color: 'text-orange-400' },
+      { text: 'متوسطة', color: 'text-yellow-400' },
+      { text: 'جيدة', color: 'text-blue-400' },
+      { text: 'قوية', color: 'text-green-400' },
+      { text: 'قوية جداً', color: 'text-green-400' }
     ]
     
     return {
@@ -157,11 +158,29 @@ const Signup = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-indigo-900 to-purple-800 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-      {/* Decorative elements */}
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+      {/* Enhanced decorative elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-96 -left-96 w-full h-96 bg-purple-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
         <div className="absolute -bottom-96 -right-96 w-96 h-96 bg-indigo-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-pink-600 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-blob animation-delay-4000"></div>
+        {/* Stars effect */}
+        <div className="absolute inset-0">
+          {[...Array(50)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute bg-white rounded-full animate-pulse"
+              style={{
+                width: Math.random() * 3 + 'px',
+                height: Math.random() * 3 + 'px',
+                top: Math.random() * 100 + '%',
+                left: Math.random() * 100 + '%',
+                animationDelay: Math.random() * 5 + 's',
+                animationDuration: Math.random() * 3 + 2 + 's'
+              }}
+            />
+          ))}
+        </div>
       </div>
       
       <motion.div 
@@ -175,27 +194,39 @@ const Signup = () => {
           variants={itemVariants}
         >
           <motion.div 
-            className="mx-auto h-20 w-20 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg mb-4"
-            whileHover={{ scale: 1.05 }}
+            className="mx-auto h-24 w-24 bg-gradient-to-r from-purple-500 via-pink-500 to-indigo-600 rounded-3xl flex items-center justify-center shadow-2xl mb-6 relative overflow-hidden"
+            whileHover={{ scale: 1.05, rotate: 5 }}
             whileTap={{ scale: 0.95 }}
           >
-            <svg className="h-10 w-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
-            </svg>
+            <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600 opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
+            <SparklesIcon className="h-12 w-12 text-white relative z-10" />
           </motion.div>
-          <h2 className="text-4xl font-bold text-white mb-2">
+          <motion.h1 
+            className="text-5xl font-bold text-white mb-3 bg-gradient-to-r from-purple-200 via-pink-200 to-indigo-200 bg-clip-text text-transparent"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+          >
             إنشاء حساب جديد
-          </h2>
-          <p className="text-purple-100">
+          </motion.h1>
+          <motion.p 
+            className="text-purple-200 text-lg"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3 }}
+          >
             انضم إلى رحلتك في تعلم سيرة الرسول والصحابة
-          </p>
+          </motion.p>
         </motion.div>
 
         <motion.div 
-          className="bg-white/10 backdrop-blur-lg rounded-2xl shadow-2xl p-8 border border-white/10"
+          className="bg-white/10 backdrop-blur-xl rounded-3xl shadow-2xl p-8 border border-white/20 relative overflow-hidden"
           variants={itemVariants}
         >
-          <form className="space-y-6" onSubmit={handleSubmit}>
+          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-purple-400/20 to-pink-400/20 rounded-full blur-2xl"></div>
+          <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-indigo-400/20 to-purple-400/20 rounded-full blur-2xl"></div>
+          
+          <form className="space-y-7 relative z-10" onSubmit={handleSubmit}>
             <motion.div variants={itemVariants}>
               <div className="relative z-0 mb-6 group">
                 <div className="relative">
@@ -206,31 +237,36 @@ const Signup = () => {
                     required
                     value={formData.email}
                     onChange={handleInputChange}
-                    className={`block py-2.5 px-0 w-full text-sm bg-transparent border-0 border-b-2 appearance-none text-white border-gray-500 focus:outline-none focus:ring-0 focus:border-purple-400 peer ${
-                      errors.email ? 'border-red-500' : ''
+                    className={`block py-4 px-4 w-full text-sm bg-white/5 backdrop-blur-sm border-2 rounded-xl appearance-none text-white border-gray-600/50 focus:outline-none focus:ring-2 focus:ring-purple-400/50 focus:border-purple-400 peer transition-all duration-300 placeholder-transparent ${
+                      errors.email ? 'border-red-500/50 focus:ring-red-400/50 focus:border-red-400' : ''
                     }`}
                     placeholder=" "
                   />
                   <label 
                     htmlFor="email" 
-                    className="peer-focus:font-medium absolute text-sm text-gray-300 duration-300 transform -translate-y-6 scale-75 top-3 right-0 origin-[0] peer-focus:text-purple-400 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+                    className="absolute text-sm text-gray-300 duration-300 transform -translate-y-4 scale-75 top-4 right-4 origin-[0] peer-focus:text-purple-300 peer-focus:scale-75 peer-focus:-translate-y-4 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0"
                   >
                     البريد الإلكتروني
                   </label>
-                  <div className="absolute left-0 bottom-2 text-gray-400">
+                  <div className="absolute left-4 top-4 text-gray-400">
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                     </svg>
                   </div>
                 </div>
-                {errors.email && (
-                  <p className="mt-1 text-sm text-red-300 flex items-center">
-                    <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    {errors.email}
-                  </p>
-                )}
+                <AnimatePresence>
+                  {errors.email && (
+                    <motion.p 
+                      className="mt-2 text-sm text-red-300 flex items-center bg-red-500/10 backdrop-blur-sm rounded-lg px-3 py-2"
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                    >
+                      <XCircleIcon className="w-4 h-4 ml-2 flex-shrink-0" />
+                      {errors.email}
+                    </motion.p>
+                  )}
+                </AnimatePresence>
               </div>
             </motion.div>
 
@@ -244,110 +280,75 @@ const Signup = () => {
                     required
                     value={formData.password}
                     onChange={handleInputChange}
-                    className={`block py-2.5 px-0 w-full text-sm bg-transparent border-0 border-b-2 appearance-none text-white border-gray-500 focus:outline-none focus:ring-0 focus:border-purple-400 peer ${
-                      errors.password ? 'border-red-500' : ''
+                    className={`block py-4 px-4 w-full text-sm bg-white/5 backdrop-blur-sm border-2 rounded-xl appearance-none text-white border-gray-600/50 focus:outline-none focus:ring-2 focus:ring-purple-400/50 focus:border-purple-400 peer transition-all duration-300 placeholder-transparent pr-12 ${
+                      errors.password ? 'border-red-500/50 focus:ring-red-400/50 focus:border-red-400' : ''
                     }`}
                     placeholder=" "
                   />
                   <label 
                     htmlFor="password" 
-                    className="peer-focus:font-medium absolute text-sm text-gray-300 duration-300 transform -translate-y-6 scale-75 top-3 right-0 origin-[0] peer-focus:text-purple-400 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+                    className="absolute text-sm text-gray-300 duration-300 transform -translate-y-4 scale-75 top-4 right-4 origin-[0] peer-focus:text-purple-300 peer-focus:scale-75 peer-focus:-translate-y-4 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0"
                   >
                     كلمة المرور
                   </label>
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute left-0 bottom-2 text-gray-400 hover:text-white focus:outline-none transition-colors duration-200"
+                    className="absolute left-4 top-4 text-gray-400 hover:text-purple-300 transition-colors duration-200"
                     aria-label={showPassword ? 'إخفاء كلمة المرور' : 'إظهار كلمة المرور'}
                   >
                     {showPassword ? (
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
-                      </svg>
+                      <EyeSlashIcon className="w-5 h-5" />
                     ) : (
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                      </svg>
+                      <EyeIcon className="w-5 h-5" />
                     )}
                   </button>
                 </div>
+                <AnimatePresence>
+                  {errors.password && (
+                    <motion.p 
+                      className="mt-2 text-sm text-red-300 flex items-center bg-red-500/10 backdrop-blur-sm rounded-lg px-3 py-2"
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                    >
+                      <XCircleIcon className="w-4 h-4 ml-2 flex-shrink-0" />
+                      {errors.password}
+                    </motion.p>
+                  )}
+                </AnimatePresence>
                 
-                {errors.password ? (
-                  <p className="mt-1 text-sm text-red-300 flex items-center">
-                    <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    {errors.password}
-                  </p>
-                ) : (
-                  <div className="mt-3 space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs text-gray-300">قوة كلمة المرور:</span>
+                {/* Password strength indicator */}
+                {formData.password && (
+                  <motion.div 
+                    className="mt-3"
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs text-gray-300">قوة كلمة المرور</span>
                       <span className={`text-xs font-medium ${passwordStrength.color}`}>
                         {passwordStrength.text}
                       </span>
                     </div>
-                    <div className="w-full bg-gray-700/50 rounded-full h-2 overflow-hidden">
+                    <div className="w-full bg-gray-700/50 rounded-full h-2">
                       <motion.div 
-                        className={`h-2 rounded-full ${passwordStrength.color}`}
+                        className={`h-2 rounded-full transition-all duration-300 ${
+                          passwordStrength.strength < 40 ? 'bg-red-500' :
+                          passwordStrength.strength < 70 ? 'bg-yellow-500' :
+                          'bg-green-500'
+                        }`}
                         initial={{ width: 0 }}
                         animate={{ width: `${passwordStrength.strength}%` }}
-                        transition={{ duration: 0.5, ease: 'easeOut' }}
-                      ></motion.div>
+                        transition={{ duration: 0.3 }}
+                      />
                     </div>
-                    <ul className="grid grid-cols-2 gap-1 text-xs text-gray-400 mt-2">
-                      <li className={`flex items-center ${formData.password.length >= 8 ? 'text-green-400' : ''}`}>
-                        <svg className={`w-3 h-3 ml-1 ${formData.password.length >= 8 ? 'text-green-400' : 'text-gray-600'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          {formData.password.length >= 8 ? (
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                          ) : (
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                          )}
-                        </svg>
-                        8 أحرف على الأقل
-                      </li>
-                      <li className={`flex items-center ${/[A-Z]/.test(formData.password) ? 'text-green-400' : ''}`}>
-                        <svg className={`w-3 h-3 ml-1 ${/[A-Z]/.test(formData.password) ? 'text-green-400' : 'text-gray-600'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          {/[A-Z]/.test(formData.password) ? (
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                          ) : (
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                          )}
-                        </svg>
-                        حرف كبير واحد على الأقل
-                      </li>
-                      <li className={`flex items-center ${/[0-9]/.test(formData.password) ? 'text-green-400' : ''}`}>
-                        <svg className={`w-3 h-3 ml-1 ${/[0-9]/.test(formData.password) ? 'text-green-400' : 'text-gray-600'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          {/[0-9]/.test(formData.password) ? (
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                          ) : (
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                          )}
-                        </svg>
-                        رقم واحد على الأقل
-                      </li>
-                      <li className={`flex items-center ${/[!@#$%^&*]/.test(formData.password) ? 'text-green-400' : ''}`}>
-                        <svg className={`w-3 h-3 ml-1 ${/[!@#$%^&*]/.test(formData.password) ? 'text-green-400' : 'text-gray-600'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          {/[!@#$%^&*]/.test(formData.password) ? (
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                          ) : (
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                          )}
-                        </svg>
-                        رمز خاص
-                      </li>
-                    </ul>
-                  </div>
+                  </motion.div>
                 )}
               </div>
             </motion.div>
 
-            <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
-                تأكيد كلمة المرور
-              <motion.div variants={itemVariants}>
+            <motion.div variants={itemVariants}>
               <div className="relative z-0 mb-6 group">
                 <div className="relative">
                   <input
@@ -357,79 +358,118 @@ const Signup = () => {
                     required
                     value={formData.confirmPassword}
                     onChange={handleInputChange}
-                    className={`block py-2.5 px-0 w-full text-sm bg-transparent border-0 border-b-2 appearance-none text-white border-gray-500 focus:outline-none focus:ring-0 focus:border-purple-400 peer ${
-                      errors.confirmPassword ? 'border-red-500' : ''
+                    className={`block py-4 px-4 w-full text-sm bg-white/5 backdrop-blur-sm border-2 rounded-xl appearance-none text-white border-gray-600/50 focus:outline-none focus:ring-2 focus:ring-purple-400/50 focus:border-purple-400 peer transition-all duration-300 placeholder-transparent pr-12 ${
+                      errors.confirmPassword ? 'border-red-500/50 focus:ring-red-400/50 focus:border-red-400' : ''
                     }`}
                     placeholder=" "
                   />
                   <label 
                     htmlFor="confirmPassword" 
-                    className="peer-focus:font-medium absolute text-sm text-gray-300 duration-300 transform -translate-y-6 scale-75 top-3 right-0 origin-[0] peer-focus:text-purple-400 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+                    className="absolute text-sm text-gray-300 duration-300 transform -translate-y-4 scale-75 top-4 right-4 origin-[0] peer-focus:text-purple-300 peer-focus:scale-75 peer-focus:-translate-y-4 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0"
                   >
                     تأكيد كلمة المرور
                   </label>
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute left-0 bottom-2 text-gray-400 hover:text-white focus:outline-none transition-colors duration-200"
-                    aria-label={showConfirmPassword ? 'إخفاء تأكيد كلمة المرور' : 'إظهار تأكيد كلمة المرور'}
+                    className="absolute left-4 top-4 text-gray-400 hover:text-purple-300 transition-colors duration-200"
+                    aria-label={showConfirmPassword ? 'إخفاء كلمة المرور' : 'إظهار كلمة المرور'}
                   >
                     {showConfirmPassword ? (
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
-                      </svg>
+                      <EyeSlashIcon className="w-5 h-5" />
                     ) : (
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                      </svg>
+                      <EyeIcon className="w-5 h-5" />
                     )}
                   </button>
                 </div>
-                
-                {errors.confirmPassword ? (
-                  <p className="mt-1 text-sm text-red-300 flex items-center">
-                    <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    {errors.confirmPassword}
-                  </p>
-                ) : formData.password && formData.confirmPassword && formData.password !== formData.confirmPassword ? (
-                  <p className="mt-1 text-sm text-yellow-300 flex items-center">
-                    <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                    </svg>
-                    كلمات المرور غير متطابقة
-                  </p>
-                ) : formData.password && formData.confirmPassword && formData.password === formData.confirmPassword ? (
-                  <p className="mt-1 text-sm text-green-400 flex items-center">
-                    <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    كلمات المرور متطابقة
-                  </p>
-                ) : null}
+                <AnimatePresence>
+                  {errors.confirmPassword && (
+                    <motion.p 
+                      className="mt-2 text-sm text-red-300 flex items-center bg-red-500/10 backdrop-blur-sm rounded-lg px-3 py-2"
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                    >
+                      <XCircleIcon className="w-4 h-4 ml-2 flex-shrink-0" />
+                      {errors.confirmPassword}
+                    </motion.p>
+                  )}
+                  {formData.password && formData.confirmPassword && formData.password === formData.confirmPassword && (
+                    <motion.p 
+                      className="mt-2 text-sm text-green-300 flex items-center bg-green-500/10 backdrop-blur-sm rounded-lg px-3 py-2"
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                    >
+                      <CheckCircleIcon className="w-4 h-4 ml-2 flex-shrink-0" />
+                      كلمات المرور متطابقة
+                    </motion.p>
+                  )}
+                </AnimatePresence>
               </div>
             </motion.div>
-            
-            <motion.div variants={itemVariants} className="mt-6">
+
+            <motion.div variants={itemVariants}>
+              <div className="relative z-0 mb-6 group">
+                <div className="relative">
+                  <input
+                    id="full_name"
+                    name="full_name"
+                    type="text"
+                    required
+                    value={formData.full_name}
+                    onChange={handleInputChange}
+                    className={`block py-4 px-4 w-full text-sm bg-white/5 backdrop-blur-sm border-2 rounded-xl appearance-none text-white border-gray-600/50 focus:outline-none focus:ring-2 focus:ring-purple-400/50 focus:border-purple-400 peer transition-all duration-300 placeholder-transparent ${
+                      errors.full_name ? 'border-red-500/50 focus:ring-red-400/50 focus:border-red-400' : ''
+                    }`}
+                    placeholder=" "
+                  />
+                  <label 
+                    htmlFor="full_name" 
+                    className="absolute text-sm text-gray-300 duration-300 transform -translate-y-4 scale-75 top-4 right-4 origin-[0] peer-focus:text-purple-300 peer-focus:scale-75 peer-focus:-translate-y-4 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0"
+                  >
+                    الاسم الكامل
+                  </label>
+                  <div className="absolute left-4 top-4 text-gray-400">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                  </div>
+                </div>
+                <AnimatePresence>
+                  {errors.full_name && (
+                    <motion.p 
+                      className="mt-2 text-sm text-red-300 flex items-center bg-red-500/10 backdrop-blur-sm rounded-lg px-3 py-2"
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                    >
+                      <XCircleIcon className="w-4 h-4 ml-2 flex-shrink-0" />
+                      {errors.full_name}
+                    </motion.p>
+                  )}
+                </AnimatePresence>
+              </div>
+            </motion.div>
+
+            <motion.div variants={itemVariants} className="mt-8">
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98]"
+                className="w-full flex justify-center items-center py-4 px-6 border border-transparent rounded-xl shadow-lg text-sm font-semibold text-white bg-gradient-to-r from-purple-600 via-pink-600 to-indigo-600 hover:from-purple-700 hover:via-pink-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] relative overflow-hidden group"
               >
+                <div className="absolute inset-0 bg-gradient-to-r from-purple-600 via-pink-600 to-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 {loading ? (
-                  <div className="flex items-center">
+                  <div className="flex items-center relative z-10">
                     <LoadingSpinner size="small" />
                     <span className="mr-2">جاري إنشاء الحساب...</span>
                   </div>
                 ) : (
-                  <>
+                  <div className="flex items-center relative z-10">
                     <span>إنشاء حساب</span>
                     <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
                     </svg>
-                  </>
+                  </div>
                 )}
               </button>
             </motion.div>
@@ -439,11 +479,11 @@ const Signup = () => {
             className="mt-6 text-center"
             variants={itemVariants}
           >
-            <p className="text-sm text-gray-300">
+            <p className="text-sm text-purple-200">
               لديك حساب بالفعل؟{' '}
               <Link 
                 to="/login" 
-                className="font-medium text-purple-300 hover:text-white transition-colors duration-200"
+                className="font-medium text-purple-300 hover:text-white transition-colors duration-200 underline underline-offset-2"
               >
                 سجل الدخول هنا
               </Link>
@@ -451,64 +491,64 @@ const Signup = () => {
           </motion.div>
         </motion.div>
 
-        {/* Features */}
-        <motion.div 
-          className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 shadow-lg"
-          variants={itemVariants}
-        >
-          <h3 className="text-lg font-bold text-white mb-4 flex items-center">
-            <span className="bg-gradient-to-r from-purple-400 to-indigo-400 text-white p-2 rounded-lg mr-2">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
-              </svg>
-            </span>
-            مزايا الانضمام
-          </h3>
-          <ul className="space-y-3">
-            {[
-              { text: 'تتبع تقدمك التعليمي', icon: '📊' },
-              { text: 'الحصول على نقاط خبرة ومكافآت', icon: '🏆' },
-              { text: 'حفظ القصص المفضلة', icon: '❤️' },
-              { text: 'الوصول لمحتوى حصري', icon: '🔒' },
-              { text: 'مشاركة إنجازاتك مع الآخرين', icon: '👥' }
-            ].map((feature, index) => (
-              <motion.li 
-                key={index}
-                className="flex items-center text-gray-200 text-right"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: index * 0.1 }}
-              >
-                <span className="ml-2 text-yellow-300">{feature.icon}</span>
-                {feature.text}
-              </motion.li>
-            ))}
-          </ul>
-        </motion.div>
+        <div className="space-y-6">
+          {/* Features */}
+          <motion.div 
+            className="bg-white/5 backdrop-blur-xl rounded-2xl p-6 shadow-xl border border-white/10"
+            variants={itemVariants}
+          >
+            <h3 className="text-lg font-bold text-white mb-4 flex items-center">
+              <div className="bg-gradient-to-r from-purple-400 to-pink-400 text-white p-2 rounded-lg mr-2">
+                <SparklesIcon className="w-5 h-5" />
+              </div>
+              مزايا الانضمام
+            </h3>
+            <ul className="space-y-3">
+              {[
+                { text: 'تتبع تقدمك التعليمي', icon: '📊', color: 'text-blue-400' },
+                { text: 'الحصول على نقاط خبرة ومكافآت', icon: '🏆', color: 'text-yellow-400' },
+                { text: 'حفظ القصص المفضلة', icon: '❤️', color: 'text-red-400' },
+                { text: 'الوصول لمحتوى حصري', icon: '🔒', color: 'text-purple-400' },
+                { text: 'مشاركة إنجازاتك مع الآخرين', icon: '👥', color: 'text-green-400' }
+              ].map((feature, index) => (
+                <motion.li 
+                  key={index}
+                  className="flex items-center text-gray-200"
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                >
+                  <span className={`ml-3 text-xl ${feature.color}`}>{feature.icon}</span>
+                  <span className="text-sm">{feature.text}</span>
+                </motion.li>
+              ))}
+            </ul>
+          </motion.div>
 
-        {/* Terms */}
-        <motion.div 
-          className="text-center"
-          variants={itemVariants}
-        >
-          <p className="text-xs text-gray-400">
-            بإنشاء حساب، فإنك توافق على{' '}
-            <Link 
-              to="/terms" 
-              className="text-purple-300 hover:text-white transition-colors duration-200"
-            >
-              الشروط والأحكام
-            </Link>
-            {' '}و{' '}
-            <Link 
-              to="/privacy" 
-              className="text-purple-300 hover:text-white transition-colors duration-200"
-            >
-              سياسة الخصوصية
-            </Link>
-          </p>
-        </motion.div>
-      </div>
+          {/* Terms */}
+          <motion.div 
+            className="text-center"
+            variants={itemVariants}
+          >
+            <p className="text-xs text-gray-400">
+              بإنشاء حساب، فإنك توافق على{' '}
+              <Link 
+                to="/terms" 
+                className="text-purple-300 hover:text-white transition-colors duration-200 underline underline-offset-2"
+              >
+                الشروط والأحكام
+              </Link>
+              {' '}و{' '}
+              <Link 
+                to="/privacy" 
+                className="text-purple-300 hover:text-white transition-colors duration-200 underline underline-offset-2"
+              >
+                سياسة الخصوصية
+              </Link>
+            </p>
+          </motion.div>
+        </div>
+      </motion.div>
     </div>
   )
 }

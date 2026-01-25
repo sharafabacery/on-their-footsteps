@@ -113,6 +113,8 @@ class User(Base):
     id = Column(Integer, primary_key=True, index=True)
     username = Column(String(100), unique=True, index=True)
     email = Column(String(255), unique=True, index=True)
+    first_name = Column(String(100))
+    last_name = Column(String(100))
     full_name = Column(String(200))
     
     # Authentication

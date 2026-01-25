@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import AuthService from '../services/authService';
 
 const AuthContext = createContext();
@@ -15,8 +15,13 @@ export const AuthProvider = ({ children, authService = new AuthService() }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const isInitialized = useRef(false);
 
   useEffect(() => {
+    // Prevent multiple initializations
+    if (isInitialized.current) return;
+    isInitialized.current = true;
+
     const initializeAuth = async () => {
       try {
         if (authService.isAuthenticated()) {

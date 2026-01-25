@@ -1,14 +1,15 @@
 import React, { useState, useEffect, Suspense, lazy } from 'react'
 import { useParams } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
-import { motion } from 'framer-motion'
-import { Clock, MapPin, ChevronRight, BookOpen, Users, Volume2, Star } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Clock, MapPin, ChevronRight, BookOpen, Users, Volume2, Star, Heart, Share2, Bookmark, Calendar, Award, TrendingUp, Eye, ThumbsUp } from 'lucide-react'
 import Lottie from 'lottie-react'
 import { useCharacter } from '../hooks/useCharacters'
 import AudioPlayer from '../components/AudioPlayer'
 import LoadingSpinner from '../components/common/LoadingSpinner'
 import ErrorDisplay from '../components/ErrorDisplay'
 import { getErrorMessage } from '../utils/errorHandler'
+import toast from 'react-hot-toast'
 
 // Lazy load heavy components
 const CharacterHero = lazy(() => import('../components/CharacterHero'));
@@ -156,27 +157,89 @@ const CharacterDetail = () => {
         )}
       </Helmet>
 
-      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
+      <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-rose-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+        {/* Animated Background Elements */}
+        <div className="fixed inset-0 overflow-hidden pointer-events-none">
+          <motion.div
+            className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-amber-200/20 to-orange-200/20 rounded-full blur-3xl"
+            animate={{
+              x: [0, 100, 0],
+              y: [0, -50, 0],
+            }}
+            transition={{
+              duration: 20,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          />
+          <motion.div
+            className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-rose-200/20 to-pink-200/20 rounded-full blur-3xl"
+            animate={{
+              x: [0, -100, 0],
+              y: [0, 50, 0],
+            }}
+            transition={{
+              duration: 15,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          />
+        </div>
+
         {/* Hero Section */}
         <Suspense fallback={<LoadingSpinner />}>
           <CharacterHero character={character} />
         </Suspense>
 
-        {/* Main Content */}
-        <div className="container mx-auto px-4 py-12">
+        {/* Enhanced Main Content */}
+        <div className="container mx-auto px-4 py-12 relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Left Column - Story Content */}
-            <div className="lg:col-span-2">
-              {/* Actions */}
-              <Suspense fallback={<LoadingSpinner />}>
-                <CharacterActions
-                  bookmarked={bookmarked}
-                  onBookmark={handleBookmarkToggle}
-                  onShare={handleShare}
-                />
-              </Suspense>
+            <div className="lg:col-span-2 space-y-6">
+              {/* Enhanced Actions */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-white/20 dark:border-gray-700/20"
+              >
+                <div className="flex flex-wrap gap-3">
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={handleBookmarkToggle}
+                    className={`flex items-center gap-2 px-6 py-3 rounded-full font-medium transition-all ${
+                      bookmarked 
+                        ? 'bg-gradient-to-r from-rose-500 to-pink-500 text-white shadow-lg' 
+                        : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 hover:shadow-md'
+                    }`}
+                  >
+                    <Bookmark size={18} className={bookmarked ? 'fill-current' : ''} />
+                    <span>{bookmarked ? 'محفوظ' : 'حفظ'}</span>
+                  </motion.button>
+                  
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={handleShare}
+                    className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-full font-medium shadow-lg hover:shadow-xl transition-all"
+                  >
+                    <Share2 size={18} />
+                    <span>مشاركة</span>
+                  </motion.button>
 
-              {/* Tabs */}
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-full font-medium shadow-lg hover:shadow-xl transition-all"
+                  >
+                    <Heart size={18} />
+                    <span>إعجاب</span>
+                  </motion.button>
+                </div>
+              </motion.div>
+
+              {/* Enhanced Tabs */}
               <Suspense fallback={<LoadingSpinner />}>
                 <CharacterTabs
                   character={character}
@@ -185,151 +248,313 @@ const CharacterDetail = () => {
                 />
               </Suspense>
 
-              {activeTab === 'story' && (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="prose prose-lg max-w-none dark:prose-invert"
-                >
-                  <div className="text-gray-700 dark:text-gray-300 leading-relaxed text-lg">
-                    {character.full_story?.split('\n').map((paragraph, idx) => (
-                      <p key={idx} className="mb-4">{paragraph}</p>
-                    ))}
-                  </div>
-                </motion.div>
-              )}
-
-              {activeTab === 'timeline' && (
-                <CharacterTimeline events={character.timeline_events} />
-              )}
-
-              {activeTab === 'achievements' && (
-                <div className="space-y-4">
-                  {character.key_achievements?.map((achievement, idx) => (
-                    <div
-                      key={idx}
-                      className="p-4 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-gray-700 dark:to-gray-800 rounded-lg border border-green-100 dark:border-gray-600"
-                    >
-                      <div className="flex items-start gap-3">
-                        <div className="p-2 bg-green-100 dark:bg-green-900 rounded-lg">
-                          <Star className="text-green-600 dark:text-green-300" />
-                        </div>
-                        <p className="text-gray-700 dark:text-gray-300">{achievement}</p>
+              <AnimatePresence mode="wait">
+                {activeTab === 'story' && (
+                  <motion.div
+                    key="story"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.3 }}
+                    className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-xl p-8 border border-white/20 dark:border-gray-700/20"
+                  >
+                    <h2 className="text-2xl font-bold mb-6 text-gray-800 dark:text-gray-100 flex items-center gap-3">
+                      <div className="p-2 bg-gradient-to-r from-amber-400 to-orange-400 rounded-lg">
+                        <BookOpen className="text-white" size={24} />
+                      </div>
+                      <span>القصة الكاملة</span>
+                    </h2>
+                    <div className="prose prose-lg max-w-none dark:prose-invert">
+                      <div className="text-gray-700 dark:text-gray-300 leading-relaxed text-lg space-y-4">
+                        {character.full_story?.split('\n').map((paragraph, idx) => (
+                          <motion.p
+                            key={idx}
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: idx * 0.1 }}
+                            className="mb-4 p-4 bg-gradient-to-r from-amber-50/50 to-orange-50/50 dark:from-gray-700/30 dark:to-gray-800/30 rounded-lg border-r-4 border-amber-400 dark:border-orange-400"
+                          >
+                            {paragraph}
+                          </motion.p>
+                        ))}
                       </div>
                     </div>
-                  ))}
-                </div>
-              )}
+                  </motion.div>
+                )}
 
-              {activeTab === 'lessons' && (
-                <div className="space-y-4">
-                  {character.lessons?.map((lesson, idx) => (
-                    <div
-                      key={idx}
-                      className="p-4 bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-gray-700 dark:to-gray-800 rounded-lg border border-blue-100 dark:border-gray-600"
-                    >
-                      <div className="flex items-start gap-3">
-                        <div className="p-2 bg-blue-100 dark:bg-blue-900 rounded-lg">
-                          <BookOpen className="text-blue-600 dark:text-blue-300" />
-                        </div>
-                        <p className="text-gray-700 dark:text-gray-300">{lesson}</p>
+                {activeTab === 'timeline' && (
+                  <motion.div
+                    key="timeline"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.3 }}
+                    className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-xl p-8 border border-white/20 dark:border-gray-700/20"
+                  >
+                    <CharacterTimeline events={character.timeline_events} />
+                  </motion.div>
+                )}
+
+                {activeTab === 'achievements' && (
+                  <motion.div
+                    key="achievements"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.3 }}
+                    className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-xl p-8 border border-white/20 dark:border-gray-700/20"
+                  >
+                    <h2 className="text-2xl font-bold mb-6 text-gray-800 dark:text-gray-100 flex items-center gap-3">
+                      <div className="p-2 bg-gradient-to-r from-green-400 to-emerald-400 rounded-lg">
+                        <Award className="text-white" size={24} />
                       </div>
+                      <span>الإنجازات الرئيسية</span>
+                    </h2>
+                    <div className="space-y-4">
+                      {character.key_achievements?.map((achievement, idx) => (
+                        <motion.div
+                          key={idx}
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: idx * 0.1 }}
+                          className="p-6 bg-gradient-to-r from-green-50/80 to-emerald-50/80 dark:from-gray-700/50 dark:to-gray-800/50 rounded-xl border border-green-200 dark:border-green-800 hover:shadow-lg transition-all"
+                        >
+                          <div className="flex items-start gap-4">
+                            <div className="p-3 bg-gradient-to-r from-green-400 to-emerald-400 rounded-xl shadow-lg">
+                              <Star className="text-white" size={20} />
+                            </div>
+                            <div className="flex-1">
+                              <p className="text-gray-700 dark:text-gray-300 font-medium leading-relaxed">{achievement}</p>
+                            </div>
+                          </div>
+                        </motion.div>
+                      ))}
                     </div>
-                  ))}
-                </div>
-              )}
+                  </motion.div>
+                )}
 
-              {/* Audio Stories */}
+                {activeTab === 'lessons' && (
+                  <motion.div
+                    key="lessons"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.3 }}
+                    className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-xl p-8 border border-white/20 dark:border-gray-700/20"
+                  >
+                    <h2 className="text-2xl font-bold mb-6 text-gray-800 dark:text-gray-100 flex items-center gap-3">
+                      <div className="p-2 bg-gradient-to-r from-blue-400 to-cyan-400 rounded-lg">
+                        <BookOpen className="text-white" size={24} />
+                      </div>
+                      <span>الدروس المستفادة</span>
+                    </h2>
+                    <div className="space-y-4">
+                      {character.lessons?.map((lesson, idx) => (
+                        <motion.div
+                          key={idx}
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: idx * 0.1 }}
+                          className="p-6 bg-gradient-to-r from-blue-50/80 to-cyan-50/80 dark:from-gray-700/50 dark:to-gray-800/50 rounded-xl border border-blue-200 dark:border-blue-800 hover:shadow-lg transition-all"
+                        >
+                          <div className="flex items-start gap-4">
+                            <div className="p-3 bg-gradient-to-r from-blue-400 to-cyan-400 rounded-xl shadow-lg">
+                              <BookOpen className="text-white" size={20} />
+                            </div>
+                            <div className="flex-1">
+                              <p className="text-gray-700 dark:text-gray-300 font-medium leading-relaxed">{lesson}</p>
+                            </div>
+                          </div>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* Enhanced Audio Stories */}
               {character.audio_stories?.length > 0 && (
-                <div className="mt-8">
-                  <h3 className="text-2xl font-bold mb-6 flex items-center gap-2">
-                    <Volume2 />
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.2 }}
+                  className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-xl p-8 border border-white/20 dark:border-gray-700/20"
+                >
+                  <h3 className="text-2xl font-bold mb-6 text-gray-800 dark:text-gray-100 flex items-center gap-3">
+                    <div className="p-2 bg-gradient-to-r from-purple-400 to-pink-400 rounded-lg">
+                      <Volume2 className="text-white" size={24} />
+                    </div>
                     <span>قصص صوتية</span>
                   </h3>
                   <div className="space-y-4">
                     {character.audio_stories.map((audio, idx) => (
-                      <AudioPlayer key={idx} src={audio.url} title={audio.title} />
+                      <motion.div
+                        key={idx}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: idx * 0.1 }}
+                        className="bg-gradient-to-r from-purple-50/80 to-pink-50/80 dark:from-gray-700/50 dark:to-gray-800/50 rounded-xl p-4 border border-purple-200 dark:border-purple-800"
+                      >
+                        <AudioPlayer src={audio.url} title={audio.title} />
+                      </motion.div>
                     ))}
                   </div>
-                </div>
+                </motion.div>
               )}
             </div>
 
-            {/* Right Column - Stats and Info */}
+            {/* Right Column - Enhanced Stats and Info */}
             <div className="space-y-6">
               {/* Character Stats */}
-              <CharacterStats character={character} />
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5 }}
+              >
+                <CharacterStats character={character} />
+              </motion.div>
 
-              {/* Quick Facts */}
-              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
-                <h3 className="text-xl font-bold mb-4">معلومات سريعة</h3>
+              {/* Enhanced Quick Facts */}
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5, delay: 0.1 }}
+                className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-white/20 dark:border-gray-700/20"
+              >
+                <h3 className="text-xl font-bold mb-6 text-gray-800 dark:text-gray-100 flex items-center gap-3">
+                  <div className="p-2 bg-gradient-to-r from-indigo-400 to-blue-400 rounded-lg">
+                    <Calendar className="text-white" size={20} />
+                  </div>
+                  <span>معلومات سريعة</span>
+                </h3>
                 <div className="space-y-4">
                   {character.birth_year && (
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
-                        <Clock size={18} />
-                        <span>سنة الميلاد</span>
+                    <motion.div
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.1 }}
+                      className="flex items-center justify-between p-3 bg-gradient-to-r from-indigo-50/50 to-blue-50/50 dark:from-gray-700/30 dark:to-gray-800/30 rounded-lg"
+                    >
+                      <div className="flex items-center gap-3 text-gray-600 dark:text-gray-400">
+                        <div className="p-2 bg-indigo-100 dark:bg-indigo-900 rounded-lg">
+                          <Clock size={16} className="text-indigo-600 dark:text-indigo-300" />
+                        </div>
+                        <span className="font-medium">سنة الميلاد</span>
                       </div>
-                      <span className="font-medium">{character.birth_year} م</span>
-                    </div>
+                      <span className="font-bold text-indigo-600 dark:text-indigo-300">{character.birth_year} م</span>
+                    </motion.div>
                   )}
 
                   {character.birth_place && (
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
-                        <MapPin size={18} />
-                        <span>مكان الميلاد</span>
+                    <motion.div
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.2 }}
+                      className="flex items-center justify-between p-3 bg-gradient-to-r from-green-50/50 to-emerald-50/50 dark:from-gray-700/30 dark:to-gray-800/30 rounded-lg"
+                    >
+                      <div className="flex items-center gap-3 text-gray-600 dark:text-gray-400">
+                        <div className="p-2 bg-green-100 dark:bg-green-900 rounded-lg">
+                          <MapPin size={16} className="text-green-600 dark:text-green-300" />
+                        </div>
+                        <span className="font-medium">مكان الميلاد</span>
                       </div>
-                      <span className="font-medium">{character.birth_place}</span>
-                    </div>
+                      <span className="font-bold text-green-600 dark:text-green-300">{character.birth_place}</span>
+                    </motion.div>
                   )}
 
                   {character.death_year && (
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
-                        <Clock size={18} />
-                        <span>سنة الوفاة</span>
+                    <motion.div
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.3 }}
+                      className="flex items-center justify-between p-3 bg-gradient-to-r from-rose-50/50 to-pink-50/50 dark:from-gray-700/30 dark:to-gray-800/30 rounded-lg"
+                    >
+                      <div className="flex items-center gap-3 text-gray-600 dark:text-gray-400">
+                        <div className="p-2 bg-rose-100 dark:bg-rose-900 rounded-lg">
+                          <Clock size={16} className="text-rose-600 dark:text-rose-300" />
+                        </div>
+                        <span className="font-medium">سنة الوفاة</span>
                       </div>
-                      <span className="font-medium">{character.death_year} م</span>
-                    </div>
+                      <span className="font-bold text-rose-600 dark:text-rose-300">{character.death_year} م</span>
+                    </motion.div>
                   )}
 
                   {character.death_place && (
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
-                        <MapPin size={18} />
-                        <span>مكان الوفاة</span>
+                    <motion.div
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.4 }}
+                      className="flex items-center justify-between p-3 bg-gradient-to-r from-purple-50/50 to-pink-50/50 dark:from-gray-700/30 dark:to-gray-800/30 rounded-lg"
+                    >
+                      <div className="flex items-center gap-3 text-gray-600 dark:text-gray-400">
+                        <div className="p-2 bg-purple-100 dark:bg-purple-900 rounded-lg">
+                          <MapPin size={16} className="text-purple-600 dark:text-purple-300" />
+                        </div>
+                        <span className="font-medium">مكان الوفاة</span>
                       </div>
-                      <span className="font-medium">{character.death_place}</span>
-                    </div>
+                      <span className="font-bold text-purple-600 dark:text-purple-300">{character.death_place}</span>
+                    </motion.div>
                   )}
                 </div>
-              </div>
+              </motion.div>
 
-              {/* Statistics */}
-              <div className="bg-gradient-to-br from-primary-500 to-primary-700 rounded-2xl shadow-lg p-6 text-white">
-                <h3 className="text-xl font-bold mb-4">الإحصائيات</h3>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <BookOpen size={18} />
-                      <span>عدد المشاهدات</span>
+              {/* Enhanced Statistics */}
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+                className="bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600 rounded-2xl shadow-xl p-6 text-white relative overflow-hidden"
+              >
+                {/* Animated background pattern */}
+                <div className="absolute inset-0 opacity-10">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-white rounded-full blur-2xl"></div>
+                  <div className="absolute bottom-0 left-0 w-24 h-24 bg-white rounded-full blur-xl"></div>
+                </div>
+                
+                <div className="relative z-10">
+                  <h3 className="text-xl font-bold mb-6 flex items-center gap-3">
+                    <div className="p-2 bg-white/20 rounded-lg backdrop-blur-sm">
+                      <TrendingUp className="text-white" size={20} />
                     </div>
-                    <span className="font-bold text-2xl">
-                      {character?.views_count?.toLocaleString() || '0'}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Users size={18} />
-                      <span>عدد المعجبين</span>
-                    </div>
-                    <span className="font-bold text-2xl">
-                      {character?.likes_count?.toLocaleString() || '0'}
-                    </span>
+                    <span>الإحصائيات</span>
+                  </h3>
+                  <div className="space-y-6">
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.3 }}
+                      className="flex items-center justify-between p-4 bg-white/10 rounded-lg backdrop-blur-sm border border-white/20"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 bg-white/20 rounded-lg">
+                          <Eye size={18} className="text-white" />
+                        </div>
+                        <span className="font-medium">المشاهدات</span>
+                      </div>
+                      <span className="font-bold text-2xl">
+                        {character?.views_count?.toLocaleString() || '0'}
+                      </span>
+                    </motion.div>
+                    
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.4 }}
+                      className="flex items-center justify-between p-4 bg-white/10 rounded-lg backdrop-blur-sm border border-white/20"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 bg-white/20 rounded-lg">
+                          <ThumbsUp size={18} className="text-white" />
+                        </div>
+                        <span className="font-medium">المعجبون</span>
+                      </div>
+                      <span className="font-bold text-2xl">
+                        {character?.likes_count?.toLocaleString() || '0'}
+                      </span>
+                    </motion.div>
                   </div>
                 </div>
-              </div>
+              </motion.div>
             </div>
           </div>
         </div>

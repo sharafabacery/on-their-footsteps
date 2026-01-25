@@ -142,6 +142,18 @@ export const GamificationProvider = ({ children }) => {
     return state.categories
   }
 
+  const getUserStats = () => {
+    return {
+      level: state.user.level,
+      xp: state.user.xp,
+      streak: state.user.streak,
+      totalXP: state.user.totalXP,
+      completedQuizzes: state.user.completedQuizzes,
+      achievements: state.user.achievements,
+      badges: state.user.badges
+    }
+  }
+
   const value = {
     ...state,
     dispatch,
@@ -149,7 +161,8 @@ export const GamificationProvider = ({ children }) => {
     completeQuiz,
     unlockAchievement,
     updateStreak,
-    unlockCategory
+    unlockCategory,
+    getUserStats
   }
 
   return (

@@ -18,6 +18,15 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const getCompanionInfo = () => {
+    const companions = {
+      1: { emoji: '🦉', name: 'نورة البومة', personality: 'حكيمة' },
+      2: { emoji: '🦅', name: 'زيد الصقر', personality: 'شجاع' },
+      3: { emoji: '🦌', name: 'ليلى الغزالة', personality: 'لطيفة' }
+    };
+    return companions[user?.companion_character_id] || null;
+  };
+
   useEffect(() => {
     const fetchDashboardData = async () => {
       if (!user) {
@@ -121,6 +130,19 @@ const Dashboard = () => {
               <p className="text-gray-600 mt-2">
                 تابع تقدمك في رحلتك لتعلم التاريخ الإسلامي
               </p>
+              {getCompanionInfo() && (
+                <div className="mt-4 flex items-center gap-3 bg-gradient-to-r from-purple-50 to-blue-50 p-4 rounded-lg">
+                  <span className="text-3xl">{getCompanionInfo().emoji}</span>
+                  <div>
+                    <p className="font-semibold text-gray-800">
+                      مرافقك: {getCompanionInfo().name}
+                    </p>
+                    <p className="text-sm text-gray-600">
+                      شخصية {getCompanionInfo().personality} ستكون معك في رحلتك التعليمية
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
             <div className="flex items-center gap-4">
               <DailyStreak streak={userStats?.streak_days || 0} />

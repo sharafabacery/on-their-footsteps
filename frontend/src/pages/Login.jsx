@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useGamification } from '../context/GamificationContext'
 import LoadingSpinner from '../components/common/LoadingSpinner'
@@ -16,6 +16,10 @@ const Login = () => {
   const { login, register } = useAuth()
   const { addXP } = useGamification()
   const navigate = useNavigate()
+  const location = useLocation()
+  
+  // Get the redirect path from location state or default to dashboard
+  const from = location.state?.from?.pathname || '/dashboard'
 
   const handleInputChange = (e) => {
     setFormData({
@@ -40,11 +44,16 @@ const Login = () => {
         toast.success('مرحباً بك كضيف! يمكنك البدء في التعلم')
       } else {
         // Regular login
-        await login(formData)
-        addXP(10) // Welcome bonus for registered users
-        toast.success('تم تسجيل الدخول بنجاح!')
+        const result = await login(formData)
+        
+        if (result.success) {
+          addXP(10) // Welcome bonus for registered users
+          toast.success('تم تسجيل الدخول بنجاح!')
+          navigate(from, { replace: true })
+        } else {
+          toast.error(result.error || 'فشل تسجيل الدخول')
+        }
       }
-      navigate('/dashboard')
     } catch (error) {
       toast.error('فشل تسجيل الدخول. يرجى المحاولة مرة أخرى')
     } finally {
@@ -60,7 +69,7 @@ const Login = () => {
       await register(formData)
       addXP(20) // Registration bonus
       toast.success('تم إنشاء الحساب بنجاح!')
-      navigate('/dashboard')
+      navigate(from, { replace: true })
     } catch (error) {
       toast.error('فشل إنشاء الحساب. يرجى المحاولة مرة أخرى')
     } finally {
@@ -110,10 +119,7 @@ const Login = () => {
             )}
           </div>
 
-          <form className="space-y-6" onSubmit={isGuest ? handleSubmit : (e) => {
-            e.preventDefault()
-            // Switch between login and register based on button clicked
-          }}>
+          <form className="space-y-6" onSubmit={handleSubmit}>
             {!isGuest && (
               <>
                 <div>

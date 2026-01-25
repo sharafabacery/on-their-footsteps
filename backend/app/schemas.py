@@ -326,16 +326,6 @@ class UserUpdateExtended(BaseModel):
     selected_path: Optional[str] = None
     selected_character_id: Optional[int] = None
 
-# User Registration with additional fields
-class UserRegisterExtended(BaseModel):
-    email: str
-    password: str
-    full_name: Optional[str] = None
-    username: Optional[str] = None
-    gender: Optional[str] = None  # "male" or "female"
-    companion_character_id: Optional[int] = None
-    selected_path: Optional[str] = None
-
 # Lesson Brief Schema (for pre-lesson display)
 class LessonBrief(BaseModel):
     id: int

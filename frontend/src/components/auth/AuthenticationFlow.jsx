@@ -47,15 +47,20 @@ const AuthenticationFlow = () => {
 
   const handleRegister = async (e) => {
     e.preventDefault();
+    
+    // Combine first and last name
+    const fullName = `${formData.firstName} ${formData.lastName}`;
+    
     const result = await register({
       email: formData.email,
       password: formData.password,
-      full_name: formData.fullName,
+      full_name: fullName,
       username: formData.username,
       gender: formData.gender,
       companion_character_id: selectedCompanion?.id,
       selected_path: selectedPath?.name
     });
+    
     if (result.success) {
       window.location.href = '/dashboard';
     }
@@ -242,29 +247,46 @@ const AuthenticationFlow = () => {
       <form onSubmit={handleRegister} className="auth-form">
         <div className="form-row">
           <div className="form-group">
-            <label htmlFor="fullName">الاسم الكامل</label>
+            <label htmlFor="firstName">الاسم الأول</label>
             <input
               type="text"
-              id="fullName"
-              name="fullName"
-              value={formData.fullName || ''}
+              id="firstName"
+              name="firstName"
+              value={formData.firstName || ''}
               onChange={handleInputChange}
               required
               disabled={loading}
+              placeholder="أدخل اسمك الأول"
             />
           </div>
 
           <div className="form-group">
-            <label htmlFor="username">اسم المستخدم (اختياري)</label>
+            <label htmlFor="lastName">الاسم الأخير</label>
             <input
               type="text"
-              id="username"
-              name="username"
-              value={formData.username || ''}
+              id="lastName"
+              name="lastName"
+              value={formData.lastName || ''}
               onChange={handleInputChange}
+              required
               disabled={loading}
+              placeholder="أدخل اسمك الأخير"
             />
           </div>
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="username">اسم المستخدم</label>
+          <input
+            type="text"
+            id="username"
+            name="username"
+            value={formData.username || ''}
+            onChange={handleInputChange}
+            required
+            disabled={loading}
+            placeholder="اختر اسم مستخدم فريد"
+          />
         </div>
 
         <div className="form-group">
@@ -277,6 +299,7 @@ const AuthenticationFlow = () => {
             onChange={handleInputChange}
             required
             disabled={loading}
+            placeholder="example@email.com"
           />
         </div>
 
@@ -291,6 +314,7 @@ const AuthenticationFlow = () => {
             required
             minLength="8"
             disabled={loading}
+            placeholder="كلمة مرور قوية (8 أحرف على الأقل)"
           />
         </div>
 
@@ -304,11 +328,75 @@ const AuthenticationFlow = () => {
             required
             disabled={loading}
           >
-            <option value="">اختر...</option>
+            <option value="">اختر الجنس</option>
             <option value="male">ذكر</option>
             <option value="female">أنثى</option>
           </select>
         </div>
+
+        {/* Companion Character Selection */}
+        {formData.gender && (
+          <div className="companion-selection">
+            <h3>اختر مرافقك في رحلة التعلم 🦉</h3>
+            <p>سيظهر معك في كل الصفحات ويشجعك في رحلتك التعليمية</p>
+            
+            <div className="companions-grid">
+              {formData.gender === 'male' ? (
+                <>
+                  <div 
+                    className={`companion-card ${selectedCompanion?.name === 'Zayd the Falcon' ? 'selected' : ''}`}
+                    onClick={() => setSelectedCompanion({ id: 2, name: 'Zayd the Falcon', arabic_name: 'زيد الصقر' })}
+                  >
+                    <div className="companion-avatar">🦅</div>
+                    <div className="companion-info">
+                      <h4>زيد الصقر</h4>
+                      <p>صقر شجاع يرشدك في رحلة التعلم</p>
+                    </div>
+                  </div>
+                  
+                  <div 
+                    className={`companion-card ${selectedCompanion?.name === 'Noora the Owl' ? 'selected' : ''}`}
+                    onClick={() => setSelectedCompanion({ id: 1, name: 'Noora the Owl', arabic_name: 'نورة البومة' })}
+                  >
+                    <div className="companion-avatar">🦉</div>
+                    <div className="companion-info">
+                      <h4>نورة البومة</h4>
+                      <p>بومة حكيمة تحب مشاركة المعرفة</p>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div 
+                    className={`companion-card ${selectedCompanion?.name === 'Layla the Gazelle' ? 'selected' : ''}`}
+                    onClick={() => setSelectedCompanion({ id: 3, name: 'Layla the Gazelle', arabic_name: 'ليلى الغزالة' })}
+                  >
+                    <div className="companion-avatar">🦌</div>
+                    <div className="companion-info">
+                      <h4>ليلى الغزالة</h4>
+                      <p>غزالة لطيفة تحكي قصص الأنبياء</p>
+                    </div>
+                  </div>
+                  
+                  <div 
+                    className={`companion-card ${selectedCompanion?.name === 'Noora the Owl' ? 'selected' : ''}`}
+                    onClick={() => setSelectedCompanion({ id: 1, name: 'Noora the Owl', arabic_name: 'نورة البومة' })}
+                  >
+                    <div className="companion-avatar">🦉</div>
+                    <div className="companion-info">
+                      <h4>نورة البومة</h4>
+                      <p>بومة حكيمة تحب مشاركة المعرفة</p>
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+
+            {!selectedCompanion && (
+              <p className="companion-hint">اختر مرافقاً للمتابعة</p>
+            )}
+          </div>
+        )}
 
         {error && <div className="error-message">{error}</div>}
 
@@ -316,7 +404,7 @@ const AuthenticationFlow = () => {
           <button 
             type="submit" 
             className="btn btn-primary"
-            disabled={loading}
+            disabled={loading || (formData.gender && !selectedCompanion)}
           >
             {loading ? 'جاري إنشاء الحساب...' : 'إنشاء حساب'}
           </button>

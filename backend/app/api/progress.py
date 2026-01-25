@@ -7,6 +7,28 @@ router = APIRouter()
 user_progress = {}
 character_progress = {}
 
+@router.get("/summary")
+async def get_progress_summary():
+    """Get overall progress summary"""
+    return {
+        "total_characters": 3,
+        "completed_characters": 1,
+        "total_lessons": 50,
+        "completed_lessons": 15,
+        "progress_percentage": 30
+    }
+
+@router.get("/stats")
+async def get_progress_stats():
+    """Get progress statistics"""
+    return {
+        "daily_active_users": 25,
+        "weekly_active_users": 120,
+        "monthly_active_users": 450,
+        "total_completed_lessons": 1250,
+        "average_completion_time": 45
+    }
+
 @router.get("/{user_id}")
 async def get_user_progress(user_id: int):
     """Get progress for a specific user"""
@@ -46,25 +68,3 @@ async def update_progress(character_id: str, data: dict):
 async def update_bookmark(character_id: str, data: dict):
     """Update bookmark status for a character"""
     return {"message": "Bookmark updated", "character_id": character_id, "bookmarked": data.get("bookmarked", False)}
-
-@router.get("/summary")
-async def get_progress_summary():
-    """Get overall progress summary"""
-    return {
-        "total_characters": 3,
-        "completed_characters": 1,
-        "total_lessons": 50,
-        "completed_lessons": 15,
-        "progress_percentage": 30
-    }
-
-@router.get("/stats")
-async def get_progress_stats():
-    """Get progress statistics"""
-    return {
-        "daily_active_users": 25,
-        "weekly_active_users": 120,
-        "monthly_active_users": 450,
-        "total_completed_lessons": 1250,
-        "average_completion_time": 45
-    }

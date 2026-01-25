@@ -133,11 +133,11 @@ async def get_character(
         HTTPException: If database error occurs (500)
         
     Example:
-        >>> GET /api/characters/abu-bakr
-        Returns Abu Bakr character data using slug
+        >>> GET /api/characters/umar-ibn-al-khattab
+        Returns Umar ibn al-Khattab character data using slug
         
         >>> GET /api/characters/2
-        Returns Abu Bakr character data using ID
+        Returns Umar ibn al-Khattab character data using ID
     """
     try:
         # Handle both numeric IDs and string slugs

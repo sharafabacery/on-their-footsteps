@@ -57,22 +57,6 @@ const Characters = () => {
       death_year: 632,
       is_featured: true,
       is_verified: true
-    },
-    {
-      id: 2,
-      name: 'Abu Bakr',
-      arabic_name: 'أبو بكر الصديق',
-      title: 'أول الخلفاء الراشدين',
-      description: 'أبو بكر الصديق هو عبد الله بن عثمان التيمي القرشي، أول الخلفاء الراشدين، وأحد العشرة المبشرين بالجنة، وهو صاحب النبي محمد ﷺ ورفيقه في الهجرة.',
-      category: 'الصحابة',
-      era: 'rashidun',
-      profile_image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/Caliph_Abu_Bakr_-_Sulayman_al-Nadawi.jpg/220px-Caliph_Abu_Bakr_-_Sulayman_al-Nadawi.jpg',
-      views_count: 5000,
-      likes_count: 2500,
-      birth_year: 573,
-      death_year: 634,
-      is_featured: true,
-      is_verified: true
     }
   ];
 

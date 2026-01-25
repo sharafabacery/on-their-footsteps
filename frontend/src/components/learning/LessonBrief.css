@@ -1,0 +1,328 @@
+.lesson-brief {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  padding: 20px;
+  font-family: 'Cairo', sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.brief-container {
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  max-width: 600px;
+  width: 100%;
+  padding: 40px;
+  animation: fadeInUp 0.6s ease-out;
+}
+
+.brief-header {
+  text-align: center;
+  margin-bottom: 30px;
+  position: relative;
+}
+
+.back-btn {
+  position: absolute;
+  right: 0;
+  top: -10px;
+  background: #e2e8f0;
+  color: #4a5568;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 25px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+}
+
+.back-btn:hover {
+  background: #cbd5e0;
+  transform: translateX(-5px);
+}
+
+.brief-header h2 {
+  color: #2d3748;
+  font-size: 2rem;
+  margin-bottom: 10px;
+  font-weight: 700;
+}
+
+.brief-content {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.brief-item {
+  background: #f8f9fa;
+  border-radius: 15px;
+  padding: 25px;
+  border-left: 4px solid #667eea;
+}
+
+.brief-item h3 {
+  color: #4a5568;
+  font-size: 1.2rem;
+  margin-bottom: 15px;
+  font-weight: 600;
+}
+
+.lesson-info h4 {
+  color: #2d3748;
+  font-size: 1.3rem;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.lesson-info p {
+  color: #718096;
+  font-size: 1rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.duration-info,
+.quiz-info {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.duration-icon,
+.quiz-icon,
+.no-quiz-icon {
+  font-size: 2rem;
+  min-width: 50px;
+  text-align: center;
+}
+
+.duration-text,
+.quiz-text,
+.no-quiz-text {
+  color: #4a5568;
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+.brief-example {
+  background: #fef5e7;
+  border: 2px solid #f6e05e;
+  border-radius: 15px;
+  padding: 25px;
+  text-align: center;
+}
+
+.brief-example h3 {
+  color: #d69e2e;
+  font-size: 1.2rem;
+  margin-bottom: 15px;
+  font-weight: 600;
+}
+
+.example-content {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  border: 1px solid #f6e05e;
+}
+
+.example-content p {
+  color: #744210;
+  font-size: 1.1rem;
+  font-style: italic;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.brief-actions {
+  text-align: center;
+  margin-top: 10px;
+}
+
+.start-lesson-btn {
+  background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+  color: white;
+  border: none;
+  padding: 15px 40px;
+  border-radius: 30px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 200px;
+}
+
+.start-lesson-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(72, 187, 120, 0.3);
+}
+
+.start-lesson-btn:active {
+  transform: translateY(0);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .lesson-brief {
+    padding: 15px;
+  }
+  
+  .brief-container {
+    padding: 30px 20px;
+    margin: 15px;
+  }
+  
+  .brief-header {
+    margin-bottom: 25px;
+  }
+  
+  .back-btn {
+    position: static;
+    margin-bottom: 15px;
+    display: inline-flex;
+  }
+  
+  .brief-header h2 {
+    font-size: 1.5rem;
+  }
+  
+  .brief-item {
+    padding: 20px;
+  }
+  
+  .brief-item h3 {
+    font-size: 1.1rem;
+  }
+  
+  .lesson-info h4 {
+    font-size: 1.2rem;
+  }
+  
+  .duration-icon,
+  .quiz-icon,
+  .no-quiz-icon {
+    font-size: 1.5rem;
+    min-width: 40px;
+  }
+  
+  .duration-text,
+  .quiz-text,
+  .no-quiz-text {
+    font-size: 1rem;
+  }
+  
+  .brief-example {
+    padding: 20px;
+  }
+  
+  .brief-example h3 {
+    font-size: 1.1rem;
+  }
+  
+  .example-content {
+    padding: 15px;
+  }
+  
+  .example-content p {
+    font-size: 1rem;
+  }
+  
+  .start-lesson-btn {
+    width: 100%;
+    padding: 12px 30px;
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .lesson-brief {
+    padding: 10px;
+  }
+  
+  .brief-container {
+    padding: 20px 15px;
+    margin: 10px;
+  }
+  
+  .brief-header h2 {
+    font-size: 1.3rem;
+  }
+  
+  .brief-item {
+    padding: 15px;
+  }
+  
+  .brief-item h3 {
+    font-size: 1rem;
+  }
+  
+  .lesson-info h4 {
+    font-size: 1.1rem;
+  }
+  
+  .duration-info,
+  .quiz-info {
+    flex-direction: column;
+    gap: 10px;
+    text-align: center;
+  }
+  
+  .duration-icon,
+  .quiz-icon,
+  .no-quiz-icon {
+    font-size: 1.3rem;
+  }
+  
+  .brief-example {
+    padding: 15px;
+  }
+  
+  .brief-example h3 {
+    font-size: 1rem;
+  }
+  
+  .example-content {
+    padding: 12px;
+  }
+  
+  .example-content p {
+    font-size: 0.9rem;
+  }
+  
+  .start-lesson-btn {
+    padding: 10px 25px;
+    font-size: 1rem;
+  }
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.brief-item {
+  animation: fadeInUp 0.6s ease-out backwards;
+}
+
+.brief-item:nth-child(1) { animation-delay: 0.1s; }
+.brief-item:nth-child(2) { animation-delay: 0.2s; }
+.brief-item:nth-child(3) { animation-delay: 0.3s; }
+.brief-example {
+  animation: fadeInUp 0.6s ease-out backwards;
+  animation-delay: 0.4s;
+}
+.brief-actions {
+  animation: fadeInUp 0.6s ease-out backwards;
+  animation-delay: 0.5s;
+}

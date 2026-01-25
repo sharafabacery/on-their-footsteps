@@ -217,16 +217,26 @@ class AuthService {
       return { success: false, error: 'No token found' };
     }
 
+    // Add simple caching to prevent repeated calls
+    const now = Date.now();
+    if (this._lastValidation && now - this._lastValidation < 5000) { // 5 seconds cache
+      return this._lastValidationResult || { success: false, error: 'Validation cached' };
+    }
+
     try {
       const response = await this.api.get('/auth/validate');
-      return { success: true, valid: true };
+      this._lastValidation = now;
+      this._lastValidationResult = { success: true, valid: true };
+      return this._lastValidationResult;
     } catch (error) {
       // If validation fails, logout user
       await this.logout();
-      return { 
+      this._lastValidation = now;
+      this._lastValidationResult = { 
         success: false, 
         error: this._extractErrorMessage(error) 
       };
+      return this._lastValidationResult;
     }
   }
 

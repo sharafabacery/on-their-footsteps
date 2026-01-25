@@ -365,3 +365,135 @@
 .choice-btn:nth-child(1) { animation-delay: 0.1s; }
 .choice-btn:nth-child(2) { animation-delay: 0.2s; }
 .choice-btn:nth-child(3) { animation-delay: 0.3s; }
+
+/* Companion Character Selection */
+.companion-selection {
+  background: #f8f9ff;
+  border: 2px solid #e6ecff;
+  border-radius: 15px;
+  padding: 25px;
+  margin-bottom: 25px;
+  text-align: center;
+}
+
+.companion-selection h3 {
+  color: #4a5568;
+  font-size: 1.3rem;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.companion-selection p {
+  color: #718096;
+  font-size: 1rem;
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+
+.companions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.companion-card {
+  background: white;
+  border: 2px solid #e2e8f0;
+  border-radius: 15px;
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+}
+
+.companion-card:hover {
+  border-color: #667eea;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.15);
+}
+
+.companion-card.selected {
+  border-color: #667eea;
+  background: linear-gradient(135deg, #f0f4ff 0%, #e6ecff 100%);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.2);
+}
+
+.companion-avatar {
+  font-size: 3rem;
+  margin-bottom: 15px;
+  animation: bounce 2s infinite;
+}
+
+.companion-card.selected .companion-avatar {
+  animation: bounce 1s infinite;
+}
+
+.companion-info h4 {
+  color: #2d3748;
+  font-size: 1.1rem;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.companion-info p {
+  color: #718096;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  margin: 0;
+}
+
+.companion-hint {
+  color: #e53e3e;
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin: 0;
+  animation: pulse 2s infinite;
+}
+
+/* Enhanced Form Styles */
+.form-group input::placeholder {
+  color: #a0aec0;
+  font-style: italic;
+}
+
+.form-group input:focus::placeholder {
+  color: transparent;
+}
+
+/* Button Enhancement */
+.btn-primary:disabled {
+  background: #cbd5e0;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.btn-primary:disabled:hover {
+  background: #cbd5e0;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Animations */
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-10px);
+  }
+  60% {
+    transform: translateY(-5px);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}

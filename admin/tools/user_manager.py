@@ -57,11 +57,14 @@ class UserManager:
             # Hash password
             hashed_password = get_password_hash(password)
             
+            # Generate username from email if not provided
+            username = email.split('@')[0] if '@' in email else email
+            
             # Insert user
             cursor.execute("""
-                INSERT INTO users (email, hashed_password, full_name, is_superuser, is_active, language, theme)
-                VALUES (?, ?, ?, ?, 1, 'ar', 'light')
-            """, (email, hashed_password, full_name, is_superuser))
+                INSERT INTO users (email, username, hashed_password, full_name, is_superuser, is_active, language, theme)
+                VALUES (?, ?, ?, ?, ?, 1, 'ar', 'light')
+            """, (email, username, hashed_password, full_name, is_superuser))
             
             user_id = cursor.lastrowid
             conn.commit()

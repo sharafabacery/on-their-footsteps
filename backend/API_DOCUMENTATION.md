@@ -71,15 +71,15 @@ GET /api/characters?page=1&limit=10&category=الصحابة&sort=views
 [
   {
     "id": 1,
-    "name": "Abu Bakr",
-    "arabic_name": "أبو بكر الصديق",
-    "english_name": "Abu Bakr al-Siddiq",
-    "title": "The First Caliph",
-    "description": "The first caliph and closest companion of Prophet Muhammad",
+    "name": "Umar ibn al-Khattab",
+    "arabic_name": "عمر بن الخطاب",
+    "english_name": "Umar ibn al-Khattab",
+    "title": "The Second Caliph",
+    "description": "The second caliph known for his justice and administrative skills",
     "category": "الصحابة",
     "era": "الخلافة الراشدة",
-    "slug": "abu-bakr",
-    "profile_image": "/static/images/abu-bakr.jpg",
+    "slug": "umar-ibn-al-khattab",
+    "profile_image": "/static/images/umar.jpg",
     "views_count": 1500,
     "likes_count": 250,
     "shares_count": 45,
@@ -153,19 +153,19 @@ GET /api/characters/abu-bakr
 ```json
 {
   "id": 1,
-  "name": "Abu Bakr",
-  "arabic_name": "أبو بكر الصديق",
-  "english_name": "Abu Bakr al-Siddiq",
-  "title": "The First Caliph",
-  "description": "The first caliph and closest companion of Prophet Muhammad",
-  "birth_year": 573,
-  "death_year": 634,
+  "name": "Umar ibn al-Khattab",
+  "arabic_name": "عمر بن الخطاب",
+  "english_name": "Umar ibn al-Khattab",
+  "title": "The Second Caliph",
+  "description": "The second caliph known for his justice and administrative skills",
+  "birth_year": 584,
+  "death_year": 644,
   "birth_place": "Mecca",
   "death_place": "Medina",
   "category": "الصحابة",
   "era": "الخلافة الراشدة",
-  "slug": "abu-bakr",
-  "profile_image": "/static/images/abu-bakr.jpg",
+  "slug": "umar-ibn-al-khattab",
+  "profile_image": "/static/images/umar.jpg",
   "views_count": 1500,
   "likes_count": 250,
   "shares_count": 45,
@@ -174,25 +174,25 @@ GET /api/characters/abu-bakr
   "verification_source": "Islamic Scholars Council",
   "verification_notes": "Verified by senior scholars",
   "created_at": "2024-01-01T00:00:00Z",
-  "full_story": "Abu Bakr was born in Mecca in 573 CE...",
+  "full_story": "Umar ibn al-Khattab was born in Mecca in 584 CE...",
   "key_achievements": [
-    "First Caliph of Islam",
-    "Established Islamic Caliphate",
-    "Compiled the Quran"
+    "Established Islamic calendar",
+    "Expanded Islamic empire",
+    "Codified Islamic law"
   ],
   "lessons": [
-    "Leadership through humility",
-    "Importance of consultation",
-    "Faith in difficult times"
+    "Justice and fairness",
+    "Strong leadership",
+    "Administrative excellence"
   ],
   "quotes": [
-    "I have been given the authority over you, but I am not the best among you.",
-    "If I were to take a friend other than my Lord, I would take Abu Bakr."
+    "If a mule stumbles while walking, I would fear that I might have stumbled"
   ],
   "timeline_events": [
     {
       "year": 573,
       "title": "Birth",
+      "description": "Event description"
       "description": "Born in Mecca to Abu Quhafah"
     },
     {
@@ -349,14 +349,14 @@ GET /api/content/search?q=خليفة&category=الصحابة&limit=5
   "results": [
     {
       "id": 1,
-      "name": "Abu Bakr",
-      "arabic_name": "أبو بكر الصديق",
-      "title": "The First Caliph",
-      "description": "The first caliph...",
+      "name": "Umar ibn al-Khattab",
+      "arabic_name": "عمر بن الخطاب",
+      "title": "The Second Caliph",
+      "description": "The second caliph...",
       "category": "الصحابة",
       "era": "الخلافة الراشدة",
-      "slug": "abu-bakr",
-      "profile_image": "/static/images/abu-bakr.jpg",
+      "slug": "umar-ibn-al-khattab",
+      "profile_image": "/static/images/umar.jpg",
       "views_count": 1500
     }
   ],

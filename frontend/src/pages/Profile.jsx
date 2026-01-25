@@ -20,6 +20,15 @@ const Profile = () => {
   const [isEditing, setIsEditing] = useState(false)
   const [userStats, setUserStats] = useState(null)
 
+  const getCompanionInfo = () => {
+    const companions = {
+      1: { emoji: '🦉', name: 'نورة البومة', personality: 'حكيمة', color: 'purple' },
+      2: { emoji: '🦅', name: 'زيد الصقر', personality: 'شجاع', color: 'orange' },
+      3: { emoji: '🦌', name: 'ليلى الغزالة', personality: 'لطيفة', color: 'green' }
+    };
+    return companions[user?.companion_character_id] || null;
+  };
+
   useEffect(() => {
     if (user) {
       setFormData({
@@ -112,6 +121,23 @@ const Profile = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Profile Card */}
           <div className="lg:col-span-2">
+            {/* Companion Character Section */}
+            {getCompanionInfo() && (
+              <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">مرافقي في رحلة التعلم 🦉</h2>
+                <div className="flex items-center gap-4 bg-gradient-to-r from-purple-50 to-blue-50 p-4 rounded-lg">
+                  <div className="companion-avatar">
+                    <span className="text-4xl">{getCompanionInfo().emoji}</span>
+                  </div>
+                  <div className="companion-info">
+                    <h3 className="font-semibold text-gray-800 text-lg">{getCompanionInfo().name}</h3>
+                    <p className="text-gray-600">شخصية {getCompanionInfo().personality}</p>
+                    <p className="text-sm text-gray-500">مرافقك في كل صفحات التطبيق</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div className="bg-white rounded-lg shadow-lg p-6">
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-xl font-semibold text-gray-900">معلوماتي</h2>

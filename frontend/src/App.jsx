@@ -9,6 +9,8 @@ import { ThemeProvider } from './context/ThemeContext'
 
 // Layout
 import Layout from './components/layout/Layout'
+import Companion from './components/common/Companion'
+import ProtectedRoute from './components/auth/ProtectedRoute'
 
 // Pages
 import Home from './pages/Home'
@@ -48,21 +50,34 @@ function App() {
                   <Route path="/" element={<Home />} />
                   <Route path="/login" element={<Login />} />
                   <Route path="/signup" element={<Signup />} />
-                  <Route path="/profile" element={<Profile />} />
+                  <Route path="/profile" element={
+                    <ProtectedRoute>
+                      <Profile />
+                    </ProtectedRoute>
+                  } />
                   <Route path="/characters" element={<Characters />} />
                   <Route path="/characters/:idOrSlug" element={<CharacterDetail />} />
                   <Route path="/categories" element={<Categories />} />
                   <Route path="/learning/:categoryId" element={<Learning />} />
                   <Route path="/timeline" element={<Timeline />} />
-                  <Route path="/dashboard" element={<Dashboard />} />
+                  <Route path="/dashboard" element={
+                    <ProtectedRoute>
+                      <Dashboard />
+                    </ProtectedRoute>
+                  } />
                   <Route path="/about" element={<About />} />
                   <Route path="/privacy" element={<Privacy />} />
                   <Route path="/terms" element={<Terms />} />
                   <Route path="/contact" element={<Contact />} />
-                  <Route path="/admin" element={<Admin />} />
+                  <Route path="/admin" element={
+                    <ProtectedRoute>
+                      <Admin />
+                    </ProtectedRoute>
+                  } />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </Layout>
+              <Companion />
               <Toaster
                 position="top-center"
                 toastOptions={{

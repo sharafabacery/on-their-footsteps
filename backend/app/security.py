@@ -249,13 +249,27 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
     finally:
         db.close()
 
+# Dependency to get current active user
+async def get_current_active_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    """Get current authenticated and active user from JWT token"""
+    user = await get_current_user(credentials)
+    if not user.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Inactive user"
+        )
+    return user
+
 # Export convenience functions
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     """Verify a password against its hash"""
     return SecurityManager.verify_password(plain_password, hashed_password)
 
 def get_password_hash(password: str) -> str:
-    """Hash a password using bcrypt"""
+    """Hash a password using bcrypt with length limit handling"""
+    # Truncate password to bcrypt's 72-byte limit
+    if len(password.encode('utf-8')) > 72:
+        password = password.encode('utf-8')[:72].decode('utf-8', errors='ignore')
     return SecurityManager.hash_password(password)
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:

@@ -22,9 +22,10 @@ class UserLogin(BaseModel):
 class UserRegister(BaseModel):
     email: str
     password: str
-    full_name: Optional[str] = None
-    username: Optional[str] = None
-    gender: Optional[str] = None  # "male" or "female"
+    first_name: str
+    last_name: str
+    username: str
+    gender: str  # "male" or "female"
     companion_character_id: Optional[int] = None
     selected_path: Optional[str] = None
 
@@ -138,10 +139,13 @@ async def register(user_data: UserRegister, db: Session = Depends(get_db)):
     
     # Create new user
     hashed_password = get_password_hash(user_data.password)
+    full_name = f"{user_data.first_name} {user_data.last_name}"
     new_user = User(
         email=user_data.email,
-        username=user_data.username or user_data.email.split("@")[0],
-        full_name=user_data.full_name,
+        username=user_data.username,
+        first_name=user_data.first_name,
+        last_name=user_data.last_name,
+        full_name=full_name,
         hashed_password=hashed_password,
         language="ar",
         theme="light",
