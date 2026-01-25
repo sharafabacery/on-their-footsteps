@@ -20,7 +20,6 @@ logger = logging.getLogger(__name__)
 class CacheLayer(Enum):
     """Cache layer types."""
     MEMORY = "memory"
-    REDIS = "redis"
     DATABASE = "database"
 
 @dataclass
@@ -164,163 +163,20 @@ class MemoryCache:
         """Get cache statistics."""
         return self.stats
 
-class RedisCache:
-    """Redis cache implementation."""
-    
-    def __init__(self, redis_client=None):
-        self.redis = redis_client
-        self.stats = CacheStats()
-        self.key_prefix = "cache:"
-    
-    def _make_key(self, key: str) -> str:
-        """Make Redis key with prefix."""
-        return f"{self.key_prefix}{key}"
-    
-    def get(self, key: str) -> Optional[Any]:
-        """Get value from Redis cache."""
-        try:
-            if not self.redis:
-                return None
-            
-            redis_key = self._make_key(key)
-            data = self.redis.get(redis_key)
-            
-            if data:
-                # Deserialize
-                try:
-                    entry = pickle.loads(data)
-                    
-                    # Update access tracking
-                    entry.accessed_at = datetime.utcnow()
-                    entry.access_count += 1
-                    
-                    # Save updated stats
-                    self.redis.setex(
-                        redis_key,
-                        entry.ttl,
-                        pickle.dumps(entry)
-                    )
-                    
-                    self.stats.hits += 1
-                    self.stats.layer_stats[CacheLayer.REDIS]["hits"] += 1
-                    
-                    return entry.value
-                    
-                except Exception as e:
-                    logger.error(f"Failed to deserialize cache entry: {e}")
-                    self.stats.misses += 1
-                    self.stats.layer_stats[CacheLayer.REDIS]["misses"] += 1
-                    return None
-            else:
-                self.stats.misses += 1
-                self.stats.layer_stats[CacheLayer.REDIS]["misses"] += 1
-                return None
-                
-        except Exception as e:
-            logger.error(f"Failed to get from Redis cache: {e}")
-            self.stats.misses += 1
-            self.stats.layer_stats[CacheLayer.REDIS]["misses"] += 1
-            return None
-    
-    def set(self, key: str, value: Any, ttl: int = 3600) -> bool:
-        """Set value in Redis cache."""
-        try:
-            if not self.redis:
-                return False
-            
-            # Calculate size
-            size_bytes = len(str(value)) if isinstance(value, str) else len(pickle.dumps(value))
-            
-            entry = CacheEntry(
-                key=key,
-                value=value,
-                ttl=ttl,
-                created_at=datetime.utcnow(),
-                accessed_at=datetime.utcnow(),
-                access_count=1,
-                size_bytes=size_bytes,
-                layer=CacheLayer.REDIS
-            )
-            
-            redis_key = self._make_key(key)
-            serialized = pickle.dumps(entry)
-            
-            self.redis.setex(redis_key, ttl, serialized)
-            
-            self.stats.sets += 1
-            self.stats.layer_stats[CacheLayer.REDIS]["sets"] += 1
-            
-            return True
-            
-        except Exception as e:
-            logger.error(f"Failed to set Redis cache entry: {e}")
-            return False
-    
-    def delete(self, key: str) -> bool:
-        """Delete value from Redis cache."""
-        try:
-            if not self.redis:
-                return False
-            
-            redis_key = self._make_key(key)
-            
-            if self.redis.delete(redis_key):
-                self.stats.deletes += 1
-                self.stats.layer_stats[CacheLayer.REDIS]["deletes"] += 1
-                return True
-            
-            return False
-            
-        except Exception as e:
-            logger.error(f"Failed to delete from Redis cache: {e}")
-            return False
-    
-    def clear(self, pattern: str = None):
-        """Clear cache entries."""
-        try:
-            if not self.redis:
-                return
-            
-            if pattern:
-                keys = self.redis.keys(f"{self.key_prefix}{pattern}")
-                if keys:
-                    self.redis.delete(*keys)
-            else:
-                keys = self.redis.keys(f"{self.key_prefix}*")
-                if keys:
-                    self.redis.delete(*keys)
-            
-            self.stats.evictions += len(keys) if keys else 0
-            
-        except Exception as e:
-            logger.error(f"Failed to clear Redis cache: {e}")
-    
-    def get_stats(self) -> CacheStats:
-        """Get cache statistics."""
-        return self.stats
-
 class AdvancedCache:
     """Advanced multi-layer caching system."""
     
     def __init__(self, config: CacheConfig = None):
+        """Initialize the advanced cache.
+        
+        Args:
+            config: Cache configuration. If None, uses default values.
+        """
         self.config = config or CacheConfig()
-        self.layers = []
+        self.layers = [MemoryCache(self.config.max_size)]
         self.stats = CacheStats()
         
-        # Initialize cache layers
-        if not self.config.layers:
-            self.config.layers = [CacheLayer.MEMORY]
-            if hasattr(self, '_redis_client') and self._redis_client:
-                self.config.layers.append(CacheLayer.REDIS)
-        
-        for layer in self.config.layers:
-            if layer == CacheLayer.MEMORY:
-                self.layers.append(MemoryCache(self.config.max_size))
-            elif layer == CacheLayer.REDIS:
-                if hasattr(self, '_redis_client') and self._redis_client:
-                    self.layers.append(RedisCache(self._redis_client))
-        
-        # Initialize cache warming
+        # Initialize cache warming if enabled
         if self.config.warm_up_enabled:
             self._warm_up_tasks = []
     
