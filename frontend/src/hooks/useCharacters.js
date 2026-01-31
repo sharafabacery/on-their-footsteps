@@ -324,7 +324,12 @@ export function useCharacter(identifier, options = {}) {
         }
         return updatedCharacter;
       }
-        },
+      return null;
+    } catch (err) {
+      const characterId = character.id || character.slug;
+      const errorDetails = {
+        message: err.message || 'Failed to increment views',
+        code: err.code || 'VIEW_INCREMENT_ERROR',
         stack: process.env.NODE_ENV === 'development' ? err.stack : undefined,
       };
       
